@@ -92,8 +92,35 @@ app.get("/buku/:judul/:tahun", (req, res) => {
 //     res.send("Tambah user")
 // })
 
-// 
+// contoh post
 app.post("/users", (req, res) => {
     const { nama, umur } = req.body;
     res.send(`User ${nama} umur ${umur} ditambahkan`)
+})
+
+// contoh put
+app.put('/users/:id', (req, res) => {
+    const { id } = req.params;
+    const { nama, umur } = req.body;
+
+    res.send(`User id ${id} diupdate jadi ${nama}, umur ${umur}`)
+})
+
+app.put('/profile/:nama', (req, res) => {
+    const { nama } = req.params;
+    const { umur, kota } = req.body;
+    
+    res.send(`Profile ${nama} diupdate jadi ${umur}, kota ${kota}`)
+})
+
+// contoh delete
+app.delete('/users/:id', (req, res) => {
+    const { id } = req.params;
+    res.send(`User dengan id ${id} sudah dihapus!!`)
+})
+
+// chanllenge 7
+app.delete('/profil/:nama', (req, res) => {
+    const { nama } = req.params;
+    res.send(`Profil ${nama} berhasil dihapus`)
 })
