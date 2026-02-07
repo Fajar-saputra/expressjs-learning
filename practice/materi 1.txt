@@ -1,0 +1,110 @@
+# Materi 1 - Dasar HTTP + REST API (Routing, Request/Response, Status Code)
+
+## 1) Konsep HTTP
+HTTP adalah protokol komunikasi antara client dan server.
+Request berisi:
+- Method (GET, POST, PUT, PATCH, DELETE)
+- URL (mis. /products/123)
+- Headers (metadata, mis. Content-Type)
+- Body (data, umumnya JSON)
+
+Response berisi:
+- Status code (mis. 200, 201, 400, 404, 500)
+- Headers
+- Body (data atau pesan)
+
+## 2) REST API dan Resource
+Resource adalah objek yang dikelola (mis. products, users).
+Contoh endpoint REST:
+- GET /products         -> ambil semua
+- GET /products/123     -> ambil satu
+- POST /products        -> tambah
+- PUT /products/123     -> ganti seluruh data
+- PATCH /products/123   -> ubah sebagian
+- DELETE /products/123  -> hapus
+
+## 3) Routing di Express
+Routing menentukan handler untuk method + path.
+Contoh:
+- app.get('/products', handler)
+- app.post('/products', handler)
+
+## 4) Request & Response di Express
+- req.params  -> data dari URL (/:id)
+- req.query   -> data query string (?limit=10)
+- req.body    -> data body (butuh app.use(express.json()))
+
+Contoh:
+- GET /products/123 -> req.params.id
+- GET /products?limit=10 -> req.query.limit
+
+## 5) Status Code Penting
+- 200 OK
+- 201 Created
+- 204 No Content
+- 400 Bad Request
+- 401 Unauthorized
+- 403 Forbidden
+- 404 Not Found
+- 500 Internal Server Error
+
+## 6) Controller Pattern (Routing + Controller)
+Pisahkan routes dan controller agar rapi.
+
+Controller (logika):
+- getProducts
+- createProduct
+- updateProduct
+- patchProduct
+- deleteProduct
+
+Routes (mapping):
+- GET /products
+- POST /products
+- PUT /products/:id
+- PATCH /products/:id
+- DELETE /products/:id
+
+## 7) Kapan pakai try/catch, next, middleware, return
+- try/catch dipakai jika tidak pakai asyncHandler, atau butuh custom error handling.
+- next(err) dipakai untuk meneruskan error ke error middleware.
+- middleware dipakai untuk logika yang dipakai ulang (auth, validation, logging, error).
+- return dipakai setelah res.json/res.send agar eksekusi berhenti.
+- throw AppError otomatis menghentikan eksekusi, jadi tidak perlu return.
+
+## 8) Urutan di index.js
+Urutan yang benar:
+1) app.use(express.json())   // parser
+2) app.use(routes)           // routing
+3) app.use(errorHandler)     // error handler terakhir
+
+## 9) require vs import
+- require = CommonJS (default di banyak project Node lama)
+- import = ESM (lebih modern, butuh "type": "module" di package.json)
+Rekomendasi: ikuti konsistensi project. Kalau sudah pakai require, lanjutkan.
+
+## 10) Zod Validation (Studi Kasus Product)
+### Schema
+- namaBarang: string min 4
+- hargaBarang: number min 100000
+- satuan: string min 1
+
+### Middleware Validasi
+- schema.safeParse(req.body)
+- kalau gagal: res.status(400).json({ errors: [...] })
+- kalau sukses: req.body = result.data
+
+### Dipakai di Route
+- router.post('/product', validate(productSchema), addProduct)
+
+### Controller Jadi Bersih
+- fokus ke logic bisnis
+
+## Ringkasan Praktik
+- Pisahkan route vs controller.
+- Gunakan asyncHandler untuk async controller.
+- Semua error masuk ke error middleware.
+- Validasi input di middleware (Zod).
+
+---
+Materi ini disimpan sebagai "materi 1" sesuai permintaan.
