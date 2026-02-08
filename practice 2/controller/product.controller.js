@@ -1,0 +1,3 @@
+exports.getProduct = (req, res) => {
+    
+}
