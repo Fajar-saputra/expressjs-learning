@@ -1,3 +1,3 @@
-exports.getProduct = (req, res) => {
+// const getProduct = (req, res) => {
     
-}
+// }
