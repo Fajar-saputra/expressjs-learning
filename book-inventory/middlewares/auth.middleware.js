@@ -1,24 +1,19 @@
-const bcrypt = require("bcrypt");
-const pool = require("../config/db");
-const AppError = require("../../utils/AppError");
-const asyncHandler = require("../../utils/asyncHandler");
+const jwt = require("jsonwebtoken");
 
-exports.register = asyncHandler(async (req, res) => {
-    const { name, email, password } = req.body;
+exports.protect = (req, res, next) => {
+  const authHeader = req.headers.authorization;
 
-    if (!email || !password) {
-        throw new AppError("Email dan password wajib diisi", 400);
-    }
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Token tidak ada" });
+  }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+  const token = authHeader.split(" ")[1];
 
-    await pool.query(
-        "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-        [name, email, hashedPassword]
-    );
-
-    res.status(201).json({
-        success: true,
-        message: "Register berhasil",
-    });
-});
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // id & role
+    next();
+  } catch (error) {
+    res.status(401).json({ message: "Token tidak valid" });
+  }
+};
