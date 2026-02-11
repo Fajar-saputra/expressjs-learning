@@ -6,15 +6,17 @@ const asynHandler = require("../utils/asyncHandler");
 const appError = require("../utils/AppError");
 
 exports.register = asynHandler(async (req, res, next) => {
-    const { username, password } = req.body;
+    const { name, email, password } = req.body;
 
-    if (!username || !password) {
-        throw new appError("Data wajib diisi!!")
+    if (!name || !email || !password) {
+        return res.status(400).json({
+            message: "name, email, password wajib diisi",
+        });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await pool.query("INSERT INTO users (username, password) VALUES (?, ?)", [username, hashedPassword]);
+    await pool.query("INSERT INTO users (name, email,password) VALUES (?,?, ?)", [name, email, hashedPassword]);
 
     res.status(201).json({
         success: true,
@@ -24,9 +26,9 @@ exports.register = asynHandler(async (req, res, next) => {
 
 exports.login = async (req, res, next) => {
     try {
-        const { username, password } = req.body;
+        const { email, password } = req.body;
 
-        const [rows] = await pool.query("SELECT * FROM users WHERE username = ?", [username]);
+        const [rows] = await pool.query("SELECT * FROM users WHERE email = ?", [email]);
 
         if (rows.length === 0) {
             return res.status(401).json({ message: "User tidak ditemukan" });
