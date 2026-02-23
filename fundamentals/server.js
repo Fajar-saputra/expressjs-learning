@@ -124,3 +124,81 @@ app.delete('/profil/:nama', (req, res) => {
     const { nama } = req.params;
     res.send(`Profil ${nama} berhasil dihapus`)
 })
+
+// learn again
+app.get("/kedua", (req, res) => {
+    res.status(200).json({ message: "kedua" });
+});
+
+app.get("/kedua/nama", (req, res) => {
+    const nama = req.query.nama;
+    res.send(`Hello ${nama}`);
+});
+
+app.get("/kedua/:tahun", (req, res) => {
+    const { tahun } = req.params.tahun;
+    res.send(`Halo ${tahun}`);
+});
+
+app.get("/kedua/profile/:nama/:tahun", (req, res) => {
+    const { nama, tahun } = req.params;
+    res.send(`Halo ${nama} tahun ${tahun}`);
+});
+
+app.get("/kedua/nama", (req, res) => {
+    const namaDepan = req.query.namaDepan;
+    const namaBelakang = req.query.namaBelakang;
+    res.send(`Hello ${namaDepan} ${namaBelakang}`);
+});
+
+app.get("/kedua/umur", (req, res) => {
+    const umur = req.query.umur;
+    if (umur < 18) {
+        res.send("Belum Dewasa");
+    }
+});
+
+app.get("/kedua/tamu", (req, res) => {
+    const tamu = req.query.tamu || "tamu";
+
+    res.send(`Hallo ${tamu}`);
+});
+
+app.post("/kedua/login", (req, res) => {
+    const { username, email } = req.body;
+
+    res.send(`email ${username} dan email ${email}`);
+});
+
+app.post("/kedua/register", (req, res) => {
+    const { nama, email, password } = req.body;
+    res.send(`${nama} berhasil register`);
+});
+
+app.get("/kedua/menu/:username/:genre", (req, res) => {
+    const { username, genre } = req.params;
+    res.send(`Username : ${username} dengan genre : ${genre}`);
+});
+
+app.get("/kedua/user", (req, res) => {
+    res.send("ambil data user");
+});
+
+app.post("/kedua/user", (req, res) => {
+    res.send("tambah data user");
+});
+
+app.put("/kedua/user/:id", (req, res) => {
+    res.send("ubah data user");
+});
+
+app.delete("/kedua/user/:id", (req, res) => {
+    res.send("hapus data user");
+});
+
+app.post("/ketiga/user", (req, res) => {
+    const { nama, email } = req.body;
+
+    res.send(`User ${nama} & email ${email} ditambahkan`)
+})
+    

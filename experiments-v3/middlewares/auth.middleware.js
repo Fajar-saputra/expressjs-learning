@@ -14,7 +14,7 @@ const protect = asyncHandler(async (req, res, next) => {
 
   // Verifikasi token
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = await jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded; // Simpan id user ke request agar bisa dipakai nanti
     next();
   } catch (err) {

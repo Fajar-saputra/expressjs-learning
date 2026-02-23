@@ -25,27 +25,24 @@ const getUsers = asyncHandler(async (req, res) => {
 const getUserById = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
-    // const [rows] = await pool.query("SELECT id, nama FROM users WHERE id = ?", [id]);
+    const [rows] = await pool.query("SELECT id, nama FROM users WHERE id = ?", [id]);
 
-    // if (rows.length === 0) {
-    //     throw new AppError(`User dengan ID ${id} tidak ditemukan`, 404);
-    // }
+    if (rows.length === 0) {
+        throw new AppError(`User dengan ID ${id} tidak ditemukan`, 404);
+    }
 
     // lebih keren
-    const [[user]] = await pool.query("SELECT id, nama FROM users WHERE id = ?", [id]);
+    // const [[user]] = await pool.query("SELECT id, nama FROM users WHERE id = ?", [id]);
 
-    if (!user) {
-        throw new AppError("User tidak ditemukan", 404);
-    }
+    // if (!user) {
+    //     throw new AppError("User tidak ditemukan", 404);
+    // }
 
-    if (rows === id) {
-        res.status(200).json({
-            success: true,
-            message: `user dengan ID ${id} ditemukan!`,
-            // data: rows[0], // rekomendasi
-            data: user,
-        });
-    }
+    res.status(200).json({
+        success: true,
+        message: `User dengan ID ${id} ditemukan!`,
+        data: rows[0],
+    });
 });
 
 const createUser = asyncHandler(async (req, res) => {
@@ -127,4 +124,4 @@ const deleteAllUsers = asyncHandler(async (req, res) => {
     });
 });
 
-module.exports = { getUsers, getUserById, createUser, deleteUserById, deleteUsers };
+module.exports = { getUsers, getUserById, createUser, deleteUserById, deleteAllUsers };
