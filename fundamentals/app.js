@@ -7,10 +7,12 @@ const port = process.env.PORT;
 
 const userRoutes = require("./routes/user.routes");
 const profileRoutes = require("./routes/profile.routes");
+const articlesRoutes = require('./routes/article.routes')
 const errorHandler = require("./middlewares/error.middleware");
 
 app.use(userRoutes);
 app.use(profileRoutes);
+app.use(articlesRoutes)
 app.use(errorHandler);
 
 app.listen(port, (req, res) => {

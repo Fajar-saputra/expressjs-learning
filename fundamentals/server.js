@@ -201,4 +201,10 @@ app.post("/ketiga/user", (req, res) => {
 
     res.send(`User ${nama} & email ${email} ditambahkan`)
 })
-    
+
+app.put('/ketiga/buku/:id', (req, res) => {
+    const { id } = req.params;
+    const { namaBuku, penulis, terbit } = req.body;
+
+    res.send(`buku dengan id ${id} sudah dibuah`)
+})
