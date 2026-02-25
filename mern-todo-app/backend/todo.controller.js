@@ -3,7 +3,7 @@ const asyncHandler = require("./utils/asyncHandler");
 const AppErr = require("./utils/AppErr");
 
 // Ambil semua Todo
-const getTodos = asyncHandler(async (req, res, next) => {
+const getTodos = asyncHandler(async (req, res, next) => {   
     const [rows] = await db.query("SELECT * FROM todos");
     res.status(200).json({ status: "success", data: rows });
 });

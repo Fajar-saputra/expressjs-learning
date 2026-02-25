@@ -1,43 +1,43 @@
-// const db = require('../')
-// const AppError = require('../utils/AppError')
-// const asyncHandler = require('../utils/asyncHandler')
+const db = require("../config/db");
+const AppError = require("../utils/AppError");
+const asyncHandler = require("../utils/asyncHandler");
 
-// exports.getAllArticles =asyncHandler( async(req, res) => {
-//     // const [result] = await
-// })
+const getArticles = asyncHandler(async (req, res) => {
+    const [rows] = await db.execute("SELECT title, content FROM articles");
 
-const getArtile = (req, res) => {
+    if (rows.length === 0) {
+        return res.status(200).json({
+            success: true,
+            message: "Article masih kosong!",
+            data: [],
+        });
+    }
+
     res.status(200).json({
-        message: "berhasil ambil semua artikel"
-    })
-}
+        success: true,
+        message: "Data berhasil diambil",
+        data: rows,
+    });
+});
 
-const createArticle = (req, res) => {
-    const { namaBuku, penerbit, tahun, genre } = req.body;
+const createArticles = asyncHandler(async (req, res) => {
+    const { title, content } = req.body;
+
+    if (title.length < 4 || content.length < 4) {
+        throw new AppError("title harus lebih dari 4 karakter!", 400);
+    }
+
+    const [result] =await db.execute("INSERT INTO articles (title, content) VALUES (?,?)", [title, content]);
 
     res.status(201).json({
-        message: "artikel baru sudah ditambahkan!",
-        data: {
-            namaBuku, penerbit, tahun, genre
+        success: true,
+        message: "berhasil menambahkan artikel",
+       data: {
+            id: result.insertId,
+            title,
+            content
         }
-    })
-}
+    });
+});
 
-const deleteArticle = (req, res) => {
-    const { id } = req.params;
-
-    res.status(200).json({
-        message: `berhasil menghapus buku dengan ID: ${id}`
-    })
-}
-
-const updateArticle = (req, res) => {
-    const { id } = req.params
-    const { penerbit } = req.body;
-
-    res.status(200).json({
-        message: `article dengan ID : ${id} diubah penerbit: ${penerbit}`
-    })
-}
- 
-module.exports = {getArtile, createArticle,deleteArticle, updateArticle}
+module.exports = { getArticles, createArticles };
