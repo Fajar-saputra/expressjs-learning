@@ -39,7 +39,7 @@ const createTodo = asyncHandler(async (req, res, next) => {
 
 const updateTodo = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
-    const { task, status } = req.body;
+    const { task, status } = req.body; 
 
     // Cek apakah id ada di database
     const [todo] = await db.query("SELECT * FROM todos WHERE id = ?", [id]);
@@ -52,7 +52,7 @@ const updateTodo = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({ status: "success", message: "Todo berhasil diperbarui" });
 });
-
+    
 // DELETE Todo
 const deleteTodo = asyncHandler(async (req, res, next) => {
     const { id } = req.params;

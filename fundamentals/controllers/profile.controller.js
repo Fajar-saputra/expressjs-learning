@@ -1,65 +1,47 @@
-// exports.getProfile = (req, res) => {
-//   res.send("Ambil profile");
-// };
+const asyncHandler = require("../utils/asyncHandler");
+const AppError = require("../utils/AppError");
+const db = require("../config/db");
 
-// exports.createProfile = (req, res) => {
-//   const { nama, bio } = req.body;
-//   res.send(`Berhasil membuat profile ${nama}, bio ${bio}`);
-// };
+const getProfiles = asyncHandler(async (req, res) => {
+    const [rows] = await db.execute("SELECT full_name, bio, phone_number, city FROM profiles");
 
-// exports.updateProfile = (req, res) => {
-//   const { id } = req.params;
-//   const { nama, bio } = req.body;
-//   res.send(`Profile ${id} diupdate: ${nama}, bio ${bio}`);
-// };
+    if (rows.length === 0) {
+        throw new AppError("Profile masih kosong", 404);
+    }
 
-// exports.deleteProfile = (req, res) => {
-//   const { id } = req.params;
-//   res.send(`Profile dengan id ${id} berhasil dihapus`);
-// };
-
-// standar industri
-exports.getProfile = (req, res) => {
     res.status(200).json({
         success: true,
-        message: "berhasil ambil data profile",
-        data: []
-    })
-}
+        message: "Berhasil ambil profile user!",
+        data: rows,
+    });
+});
 
-exports.createProfile = (req, res) => {
-    const { username, nama, bio, foto } = req.body;
+const createProfiles = asyncHandler(async (req, res) => {
+    const { full_name, bio, phone_number, city } = req.body;
+
+    // Validasi field wajib
+    if (!full_name || !bio || !phone_number || !city) {
+        throw new AppError("Semua field wajib diisi!", 400);
+    }
+
+    // Validasi panjang karakter
+    if (full_name.length < 5 || bio.length < 5 || phone_number.length < 5 || city.length < 5) {
+        throw new AppError("Minimal 5 karakter!", 400);
+    }
+
+    const [result] = await db.execute("INSERT INTO profiles (full_name, bio, phone_number, city) VALUES (?,?,?,?)", [full_name, bio, phone_number, city]);
 
     res.status(201).json({
         success: true,
-        message: "Berhasil dibuat",
+        message: `berhasil buat profile dari user : ${full_name}`,
         data: {
-            username,
-            nama,
+            id: result.insertId,
+            full_name,
             bio,
-            foto
-        }
-    })
-}
+            phone_number,
+            city,
+        },
+    });
+});
 
-exports.updateProfile = (req, res) => {
-    const { id } = req.params;
-    const { username, nama, bio, foto } = req.body;
-
-    res.status(200).json({
-        success: true,
-        message: `ID ${id} berhasil update`,
-        data: {
-            username, nama, bio, foto
-        }
-    })
-}
-
-exports.deleteProfile = (req, res) => {
-    const { id } = req.params;
-
-    res.status(200).json({
-        success: true,
-        message: `ID ${id} berhasil di hapus`
-    })
-}
+module.exports = { getProfiles, createProfiles };
