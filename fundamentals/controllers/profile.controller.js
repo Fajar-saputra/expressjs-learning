@@ -1,9 +1,10 @@
 const asyncHandler = require("../utils/asyncHandler");
 const AppError = require("../utils/AppError");
-const db = require("../config/db");
+const db = require("../config/db")
 
-const getProfiles = asyncHandler(async (req, res) => {
-    const [rows] = await db.execute("SELECT full_name, bio, phone_number, city FROM profiles");
+const getProfiles = asyncHandler(async (req, res) => {  
+    // const [rows] = await db.execute("SELECT full_name, bio, phone_number, city FROM profiles");
+    const [rows] = await db.execute("SELECT bio FROM profiles");
 
     if (rows.length === 0) {
         throw new AppError("Profile masih kosong", 404);
@@ -25,7 +26,7 @@ const createProfiles = asyncHandler(async (req, res) => {
     }
 
     // Validasi panjang karakter
-    if (full_name.length < 5 || bio.length < 5 || phone_number.length < 5 || city.length < 5) {
+    if (full_name.length < 5 || bio.length < 5 || phone_number.length < 5 || city.length < 4) {
         throw new AppError("Minimal 5 karakter!", 400);
     }
 
@@ -33,7 +34,7 @@ const createProfiles = asyncHandler(async (req, res) => {
 
     res.status(201).json({
         success: true,
-        message: `berhasil buat profile dari user : ${full_name}`,
+        message: `berhasil buat profi   le dari user : ${full_name}`,
         data: {
             id: result.insertId,
             full_name,
@@ -44,4 +45,26 @@ const createProfiles = asyncHandler(async (req, res) => {
     });
 });
 
-module.exports = { getProfiles, createProfiles };
+const deleteProfiles = asyncHandler( async (req, res) => {
+    const { id } = req.params;
+
+    if (isNaN(id)) {
+        throw new AppError("Profile tidak ditemukan!", 404)
+    }
+
+    const [result] = db.execute("DELETE FROM profiles WHERE id = ?", [id])
+
+    if (result.affectRows === 0) {
+        throw new AppError("Gagal menghapus! Profile tidak ditemukan", 404)
+    }
+
+    res.status(200).json({
+        success: true,
+        message: "profile berhasil dihapus!",
+        data: {
+            id: Number(id)
+        }
+    })
+})
+
+module.exports = { getProfiles, createProfiles, deleteProfiles };
