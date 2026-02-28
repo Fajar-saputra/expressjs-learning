@@ -1,10 +1,10 @@
 const asyncHandler = require("../utils/asyncHandler");
 const AppError = require("../utils/AppError");
-const db = require("../config/db")
+const db = require("../config/db");
 
-const getProfiles = asyncHandler(async (req, res) => {  
+const getProfiles = asyncHandler(async (req, res) => {
     // const [rows] = await db.execute("SELECT full_name, bio, phone_number, city FROM profiles");
-    const [rows] = await db.execute("SELECT bio FROM profiles");
+    const [rows] = await db.execute("SELECT id, full_name FROM profiles");
 
     if (rows.length === 0) {
         throw new AppError("Profile masih kosong", 404);
@@ -34,7 +34,7 @@ const createProfiles = asyncHandler(async (req, res) => {
 
     res.status(201).json({
         success: true,
-        message: `berhasil buat profi   le dari user : ${full_name}`,
+        message: `berhasil buat profile dari user : ${full_name}`,
         data: {
             id: result.insertId,
             full_name,
@@ -45,26 +45,49 @@ const createProfiles = asyncHandler(async (req, res) => {
     });
 });
 
-const deleteProfiles = asyncHandler( async (req, res) => {
+const deleteProfiles = asyncHandler(async (req, res) => {
     const { id } = req.params;
 
     if (isNaN(id)) {
-        throw new AppError("Profile tidak ditemukan!", 404)
+        throw new AppError("Profile tidak ditemukan!", 404);
     }
 
-    const [result] = db.execute("DELETE FROM profiles WHERE id = ?", [id])
+    const [result] = db.execute("DELETE FROM profiles WHERE id = ?", [id]);
 
     if (result.affectRows === 0) {
-        throw new AppError("Gagal menghapus! Profile tidak ditemukan", 404)
+        throw new AppError("Gagal menghapus! Profile tidak ditemukan", 404);
     }
 
     res.status(200).json({
         success: true,
         message: "profile berhasil dihapus!",
         data: {
-            id: Number(id)
-        }
-    })
-})
+            id: Number(id),
+        },
+    });
+});
 
-module.exports = { getProfiles, createProfiles, deleteProfiles };
+const updateProfiles = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    const { full_name, bio, phone_number, city } = req.body;
+
+    const [rows] = await db.execute("SELECT id FROM profiles WHERE id = ?", [id]);
+
+    if (rows.length === 0) {
+        throw new AppError("Profile tidak ditemukan!", 404);
+    }
+
+    const [updateResult] = await db.execute(
+        "UPDATE profiles SET full_name = COALESCE(?, full_name), bio = COALESCE(?, bio), phone_number = COALESCE(?, phone_number), city = COALESCE(?, city) WHERE id = ? ",
+        [full_name || null, bio || null, phone_number || null, city || null, id],
+    );
+
+    res.status(200).json({
+        success: true,
+        message: "berhasil update profile",
+        changed: updateResult.changedRows > 0,
+    });
+});
+
+module.exports = { getProfiles, createProfiles, deleteProfiles, updateProfiles };
