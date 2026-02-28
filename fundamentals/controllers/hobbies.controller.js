@@ -33,14 +33,6 @@ const getHobbyById = asyncHandler(async (req, res) => {
 const createHobbies = asyncHandler(async (req, res) => {
     const { name, description } = req.body;
 
-    if (!name || !description) {
-        throw new AppError("Semua field wajib diisi", 400);
-    }
-
-    if (name.length < 4 || description.length < 4) {
-        throw new AppError("Minimal 4 karakter", 400);
-    }
-
     // Perbaikan: Menghapus koma ganda
     const [result] = await db.execute(
         "INSERT INTO hobbies (name, description) VALUES (?,?)", 

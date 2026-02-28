@@ -20,16 +20,6 @@ const getProfiles = asyncHandler(async (req, res) => {
 const createProfiles = asyncHandler(async (req, res) => {
     const { full_name, bio, phone_number, city } = req.body;
 
-    // Validasi field wajib
-    if (!full_name || !bio || !phone_number || !city) {
-        throw new AppError("Semua field wajib diisi!", 400);
-    }
-
-    // Validasi panjang karakter
-    if (full_name.length < 5 || bio.length < 5 || phone_number.length < 5 || city.length < 4) {
-        throw new AppError("Minimal 5 karakter!", 400);
-    }
-
     const [result] = await db.execute("INSERT INTO profiles (full_name, bio, phone_number, city) VALUES (?,?,?,?)", [full_name, bio, phone_number, city]);
 
     res.status(201).json({
