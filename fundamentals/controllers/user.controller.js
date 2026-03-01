@@ -1,88 +1,103 @@
-// kelas industri
-// const AppError = require("../utils/AppError");
-// const asyncHandler = require("../utils/asyncHandler");
+const AppError = require("../utils/AppError");
+const asyncHandler = require("../utils/asyncHandler");  
+const db = require("../config/db");
 
-// const getUser = (req, res) => {
-//     res.send(`Ambil user`)
-// }
+const getUsers = asyncHandler(async (req, res) => {
+    const [rows] = await db.execute('SELECT * FROM  users');
 
-// const createUser = (req, res) => {
-//     const { nama, umur } = req.body;
-//     res.send(`User ${nama} ${umur} berhasil dibuat!`)
-// }
+    if (rows.length === 0) {
+        return res.status(200).json({
+            success: true,
+            message: "data masih kosong",
+            data: []
+        })
+    }
 
-const updateUser = (req, res) => {
-    const { id } = req.params;
-    const { nama, umur } = req.body;
-    res.send(`Nama ${nama} dan umur ${umur} berhasil update!`);
-};
-
-const deleteUser = (req, res) => {
-    const { id } = req.params;
-    res.send(`User id ${id}`);
-};
-
-const getUser = (req, res) => {
     res.status(200).json({
         success: true,
-        message: "Berhasil ambil data user",
-        data: [],
+        message: "berhasil mengambil data",
+        data: rows
+    })
+    
+});
+
+const getUserById = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    const [rows] = await db.execute(
+        "SELECT id, username, email FROM users WHERE id = ?",
+        [id]
+    );
+
+    // Jika user tidak ditemukan
+    if (rows.length === 0) {
+        return res.status(404).json({
+            success: false,
+            message: `User dengan ID ${id} tidak ditemukan`
+        });
+    }
+
+    // Jika ditemukan
+    res.status(200).json({
+        success: true,
+        message: `Berhasil ambil user dengan ID ${id}`,
+        data: rows[0]
     });
-};
+});
 
-// const createUser = (req, res, next) => {
-//     const { nama, umur } = req.body;
+const createUsers = asyncHandler( async (req, res) => {
+    const { username, email, password } = req.body;
 
-//     if (!nama) {
-//         return next(new AppError("Nama wajib ada", 400));
-//     }
+    const [result] = await db.execute("INSERT INTO users (username, email, password) VALUES (?,?,?)", [username, email, password])
 
-//     if (!umur || isNaN(umur)) {
-//         return next(new AppError("Umur harus berupa angka", 400));
-//     }
+    res.status(201).json({
+        success: true,
+        message: "berhasil menambahkan user baru",
+        data: {
+            id: result.insertId,
+            username: username,
+            email: email
+        }
+    })
+})
 
-//     if (umur < 1) {
-//         return next(new AppError("Umur tidak valid", 400));
-//     }
+const updateUser = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { username, email, password } = req.body;
 
-//     res.status(201).json({
-//         success: true,
-//         message: `Berhasil buat ${nama}`,
-//         data: {
-//             nama,
-//             umur,
-//         },
-//     });
-// };
 
-// const createUser = asyncHandler(async (req, res, next) => {
-//     const { nama, umur } = req.body;
+    const [rows] = await db.execute("SELECT id FROM users WHERE id = ?", [id])
 
-//     if (!nama) throw new AppError("Nama wajib ada!", 400);
-//     if (!umur || isNaN(umur)) throw new AppError("Umur wajib ada!", 400);
-//     if (umur < 1) throw new AppError("Umur tidak valid!", 400);
+    if (rows.length === 0) {
+        throw new AppError("User tidak ditemukan", 404)
+    }
 
-//     await new Promise((resolve) => setTimeout(resolve, 100));
+    const [result] = await db.execute("UPDATE users SET username = COALESCE(?, username), email = COALESCE(?, email), password = COALESCE(?, password) WHERE id = ?", [username || null, email || null, password|| null, id || null])
 
-//     res.status(201).json({
-//         success: true,
-//         message: "berhasil dibuat",
-//         data: { nama, umur },
-//     });
-// });
+    res.status(200).json({
+        success: true,
+        message: `berhasil update user ID ${id}`,
+        data: {
+            changed: result.changedRows > 0
+        }
+    })
 
-// const getUserById = asyncHandler(async (req, res, next) => {
-//     const { id } = req.params;
 
-//     if (id !== "1") throw new AppError("User tidak ditemukan!!", 404);
+})
 
-//     // simulasi async (misalnya database)
-//     await new Promise((resolve) => setTimeout(resolve, 100));
+const deleteUser = asyncHandler(async (req, res) => {
+    const { id } = req.params;
 
-//     res.status(200).json({
-//         success: true,
-//         message: `User dengan ID ${id} ditemukan`,
-//     });
-// });
+    const [result] = await db.execute("DELETE FROM users WHERE id = ?", [id])
 
-module.exports = {getUser}
+    if (result.affectedRows === 0) {
+        throw new AppError("User tidak ditemukan!", 404)
+    }
+
+    res.status(200).json({
+        success: true,
+        message: `Berhasil hapus user ID ${id}`,
+    })
+})
+
+module.exports = {getUsers, createUsers, getUserById, deleteUser, updateUser}

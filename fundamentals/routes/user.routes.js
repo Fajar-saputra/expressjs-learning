@@ -1,14 +1,14 @@
 const express = require("express");
-const router = express.Router()
+const router = express.Router();
+const {validate} = require("../middlewares/validate");
+const {usersSchema} = require("../validations/usersValidation");
 
-// const { getUser, deleteUser, createUser, updateUser, getUserById } = require("../controllers/user.controller");
-const { getUser } = require("../controllers/user.controller");
+const { getUsers, createUsers, getUserById, deleteUser, updateUser } = require("../controllers/user.controller");
 
+router.get("/users", getUsers);
+router.get("/users/:id", getUserById)
+router.post("/users", validate(usersSchema), createUsers);
+router.patch("/users/:id", updateUser)
+router.delete("/users/:id", deleteUser)
 
-router.get("/users", getUser)
-// router.get("/users/:id", getUserById)
-// router.post("/users", createUser)
-// router.put("/users/:id", updateUser)
-// router.delete("/users/:id", deleteUser)
-
-module.exports = router
+module.exports = router;

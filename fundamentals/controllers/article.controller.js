@@ -23,10 +23,6 @@ const getArticles = asyncHandler(async (req, res) => {
 const createArticles = asyncHandler(async (req, res) => {
     const { title, content } = req.body;
 
-    if (title.length < 4 || content.length < 4) {
-        throw new AppError("title harus lebih dari 4 karakter!", 400);
-    }
-
     const [result] = await db.execute("INSERT INTO articles (title, content) VALUES (?,?)", [title, content]);
 
     res.status(201).json({
