@@ -3,7 +3,7 @@ const asyncHandler = require("../utils/asyncHandler");
 const AppError = require("../utils/AppError");
 
 const getUsers = asyncHandler(async (req, res) => {
-    const query = "SELECT id, nama, umur, created_at FROM users";
+    const query = "SELECT username, email FROM users";
     const [rows] = await pool.query(query);
 
     if (rows.length === 0) {
@@ -25,14 +25,14 @@ const getUsers = asyncHandler(async (req, res) => {
 const getUserById = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
-    const [rows] = await pool.query("SELECT id, nama FROM users WHERE id = ?", [id]);
+    const [rows] = await pool.query("SELECT id, username FROM users WHERE id = ?", [id]);
 
     if (rows.length === 0) {
         throw new AppError(`User dengan ID ${id} tidak ditemukan`, 404);
     }
 
     // lebih keren
-    // const [[user]] = await pool.query("SELECT id, nama FROM users WHERE id = ?", [id]);
+    // const [[user]] = await pool.query("SELECT id, username FROM users WHERE id = ?", [id]);
 
     // if (!user) {
     //     throw new AppError("User tidak ditemukan", 404);
@@ -46,39 +46,39 @@ const getUserById = asyncHandler(async (req, res, next) => {
 });
 
 const createUser = asyncHandler(async (req, res) => {
-    let { nama, umur } = req.body;
+    let { username, email } = req.body;
 
     // 1. Validasi keberadaan data
-    if (!nama || !umur) {
-        throw new AppError("Nama dan umur wajib diisi!", 400);
+    if (!username || !email) {
+        throw new AppError("Nama dan email wajib diisi!", 400);
     }
 
     // 2. Sanitasi & Validasi tipe data
-    nama = nama.trim();
-    if (nama.length < 3) {
+    username = username.trim();
+    if (username.length < 3) {
         throw new AppError("Nama minimal 3 karakter!", 400);
     }
 
-    if (umur < 0 || umur > 120) {
+    if (email < 0 || email > 120) {
         throw new AppError("Umur tidak masuk akal!", 400);
     }
 
     // 3. Cek Duplikasi (Opsional, tergantung kebutuhan)
-    const [check] = await pool.query("SELECT id FROM users WHERE nama = ?", [nama]);
+    const [check] = await pool.query("SELECT id FROM users WHERE username = ?", [username]);
     if (check.length > 0) {
-        throw new AppError("User dengan nama ini sudah ada!", 400);
+        throw new AppError("User dengan username ini sudah ada!", 400);
     }
 
     // 4. Insert data
-    const [result] = await pool.query("INSERT INTO users (nama, umur) VALUES (?,?)", [nama, umur]);
+    const [result] = await pool.query("INSERT INTO users (username, email) VALUES (?,?)", [username, email]);
 
     res.status(201).json({
         success: true,
         message: "User berhasil ditambahkan!",
         data: {
             id: result.insertId,
-            nama,
-            umur,
+            username,
+            email,
         },
     });
 });
