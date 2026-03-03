@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const port = process.env.PORT;
 
@@ -9,12 +10,14 @@ const userRoutes = require("./routes/user.routes");
 const profileRoutes = require("./routes/profile.routes");
 const articlesRoutes = require('./routes/article.routes')
 const hobbiesRoutes = require('./routes/hobbies.router')
+const authRoutes = require('./routes/auth.routes')
 const errorHandler = require("./middlewares/error.middleware");
 
 app.use(userRoutes);
 app.use(profileRoutes);
 app.use(articlesRoutes)
 app.use(hobbiesRoutes)
+app.use(authRoutes)
 app.use(errorHandler);
 
 app.listen(port, (req, res) => {
