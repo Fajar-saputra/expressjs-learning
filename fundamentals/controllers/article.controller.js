@@ -23,7 +23,9 @@ const getArticles = asyncHandler(async (req, res) => {
 const createArticles = asyncHandler(async (req, res) => {
     const { title, content } = req.body;
 
-    const [result] = await db.execute("INSERT INTO articles (title, content) VALUES (?,?)", [title, content]);
+    const userId = req.user.id;
+
+    const [result] = await db.execute("INSERT INTO articles (id, title, content) VALUES (?,?,?)", [userId, title, content]);
 
     res.status(201).json({
         success: true,
