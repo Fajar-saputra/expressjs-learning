@@ -12,6 +12,6 @@ const errorHandler = require("./middlewares/error.middleware");
 app.use(userRoutes);
 app.use(errorHandler);
 
-app.listen(port, (req, res) => {
+app.listen(port, () => {
     console.log(`apa runing at ${port}`);
 });

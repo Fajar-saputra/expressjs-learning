@@ -42,7 +42,7 @@ const createUser = asyncHandler(async (req, res) => {
     const data = req.body;
 
     // 1. Pastikan menggunakan data.email
-    const [existingUsers] = await db.execute('SELECT email FROM anggota WHERE email = ?', [data.email]);
+    const [existingUsers] = await db.execute("SELECT email FROM anggota WHERE email = ?", [data.email]);
 
     // 2. Jika user DITEMUKAN (panjang array > 0), baru lempar error
     if (existingUsers.length > 0) {
@@ -57,26 +57,26 @@ const createUser = asyncHandler(async (req, res) => {
     `;
 
     const [result] = await db.execute(query, [
-        data.nim, 
-        data.nama, 
-        data.jurusan, 
-        data.prodi, 
-        data.semester, 
-        data.angkatan, 
-        data.email, 
-        data.no_telepon, 
-        data.tanggal_daftar, 
-        data.tanggal_akhir_aktif, 
-        data.alamat, 
-        data.foto
+        data.nim,
+        data.nama,
+        data.jurusan,
+        data.prodi,
+        data.semester,
+        data.angkatan,
+        data.email,
+        data.no_telepon,
+        data.tanggal_daftar,
+        data.tanggal_akhir_aktif,
+        data.alamat,
+        data.foto,
     ]);
 
     res.status(201).json({
         success: true,
         message: "Berhasil membuat pengguna",
         data: {
-            id: result.insertId
-        }
+            id: result.insertId,
+        },
     });
 });
 
@@ -140,20 +140,16 @@ const updateUser = asyncHandler(async (req, res) => {
     const data = req.body;
 
     // 1. Definisikan urutan kolom sesuai dengan query SQL
-    const fields = [
-        'nim', 'nama', 'jurusan', 'prodi', 'semester', 'angkatan', 
-        'email', 'no_telepon', 'tanggal_daftar', 'tanggal_akhir_aktif', 
-        'alamat', 'foto'
-    ];
+    const fields = ["nim", "nama", "jurusan", "prodi", "semester", "angkatan", "email", "no_telepon", "tanggal_daftar", "tanggal_akhir_aktif", "alamat", "foto"];
 
     // 2. Map data secara dinamis, pastikan diakhiri dengan ID untuk WHERE clause
-    const values = fields.map(field => data[field] ?? null);
-    values.push(id); 
+    const values = fields.map((field) => data[field] ?? null);
+    values.push(id);
 
     // 3. Query Update dengan COALESCE
     const query = `
         UPDATE anggota SET 
-            ${fields.map(field => `${field} = COALESCE(?, ${field})`).join(', ')}
+            ${fields.map((field) => `${field} = COALESCE(?, ${field})`).join(", ")}
         WHERE id_anggota = ?
     `;
 
@@ -166,7 +162,7 @@ const updateUser = asyncHandler(async (req, res) => {
     res.status(200).json({
         success: true,
         message: "Data berhasil diperbarui secara dinamis",
-        data: { id }
+        data: { id },
     });
 });
 
@@ -191,8 +187,8 @@ const deleteUser = asyncHandler(async (req, res) => {
         message: `Berhasil menghapus anggota dengan ID: ${id}`,
         data: {
             id_anggota: id, // Gunakan 'id' dari params, karena DELETE tidak menghasilkan 'insertId'
-            affectedRows: result.affectedRows // Opsional: untuk memastikan jumlah baris yang terhapus
-        }
+            affectedRows: result.affectedRows, // Opsional: untuk memastikan jumlah baris yang terhapus
+        },
     });
 });
 
