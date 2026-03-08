@@ -3,7 +3,7 @@ const asyncHandler = require("../utils/asyncHandler");
 const db = require("../config/db");
 
 const getAllUsers = asyncHandler(async (req, res) => {
-    const [rows] = await db.execute("SELECT * FROM anggota ORDER BY nama ASC");
+    const [rows] = await db.execute("SELECT * FROM users ORDER BY nama ASC");
 
     if (rows.length === 0) {
         return res.status(200).json({
@@ -23,7 +23,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
 const getUserById = asyncHandler(async (req, res) => {
     const { id } = req.params;
 
-    const [anggota] = await db.execute("SELECT * FROM anggota WHERE id_anggota = ?", [id]);
+    const [anggota] = await db.execute("SELECT * FROM users WHERE id = ?", [id]);
 
     if (anggota.length === 0) {
         return res.status(404).json({
@@ -35,48 +35,6 @@ const getUserById = asyncHandler(async (req, res) => {
         success: true,
         message: `Berhasil ambil user ID ${id}`,
         data: anggota[0],
-    });
-});
-
-const createUser = asyncHandler(async (req, res) => {
-    const data = req.body;
-
-    // 1. Pastikan menggunakan data.email
-    const [existingUsers] = await db.execute("SELECT email FROM anggota WHERE email = ?", [data.email]);
-
-    // 2. Jika user DITEMUKAN (panjang array > 0), baru lempar error
-    if (existingUsers.length > 0) {
-        throw new appError("Pengguna dengan email ini sudah terdaftar!", 400);
-    }
-
-    // 3. Pastikan jumlah kolom dan tanda tanya (?) sinkron (di sini saya asumsikan 12 kolom)
-    const query = `
-        INSERT INTO anggota 
-        (nim, nama, jurusan, prodi, semester, angkatan, email, no_telepon, tanggal_daftar, tanggal_akhir_aktif, alamat, foto) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    const [result] = await db.execute(query, [
-        data.nim,
-        data.nama,
-        data.jurusan,
-        data.prodi,
-        data.semester,
-        data.angkatan,
-        data.email,
-        data.no_telepon,
-        data.tanggal_daftar,
-        data.tanggal_akhir_aktif,
-        data.alamat,
-        data.foto,
-    ]);
-
-    res.status(201).json({
-        success: true,
-        message: "Berhasil membuat pengguna",
-        data: {
-            id: result.insertId,
-        },
     });
 });
 
@@ -140,7 +98,7 @@ const updateUser = asyncHandler(async (req, res) => {
     const data = req.body;
 
     // 1. Definisikan urutan kolom sesuai dengan query SQL
-    const fields = ["nim", "nama", "jurusan", "prodi", "semester", "angkatan", "email", "no_telepon", "tanggal_daftar", "tanggal_akhir_aktif", "alamat", "foto"];
+    const fields = ["nim", "nama", "email"];
 
     // 2. Map data secara dinamis, pastikan diakhiri dengan ID untuk WHERE clause
     const values = fields.map((field) => data[field] ?? null);

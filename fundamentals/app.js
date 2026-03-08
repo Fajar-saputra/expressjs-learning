@@ -7,9 +7,11 @@ app.use(express.urlencoded({ extended: true }));
 const port = process.env.PORT;
 
 const userRoutes = require("./routes/users.routes");
+const authRoutes = require('./routes/auth.routes')
 const errorHandler = require("./middlewares/error.middleware");
 
 app.use(userRoutes);
+app.use(authRoutes)
 app.use(errorHandler);
 
 app.listen(port, () => {
