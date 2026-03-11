@@ -98,7 +98,7 @@ const updateUser = asyncHandler(async (req, res) => {
     const data = req.body;
 
     // 1. Definisikan urutan kolom sesuai dengan query SQL
-    const fields = ["nim", "nama", "email"];
+    const fields = ["nim", "nama", "email"];            
 
     // 2. Map data secara dinamis, pastikan diakhiri dengan ID untuk WHERE clause
     const values = fields.map((field) => data[field] ?? null);
