@@ -1,4 +1,6 @@
 const db = require("./db");
+const { asycnHandler } = require("./middlewares/asyncHandler");
+const { AppError } = require("./utils/AppError");
 
 const getProducts = async (req, res) => {
     const [products] = await db.query("SELECT * from products");
@@ -10,7 +12,7 @@ const getProducts = async (req, res) => {
     });
 };
 
-const createProducts = async (req, res) => {
+const createProducts = asycnHandler( async (req, res) => {
     const { name, price } = req.body;
 
     const sql = "INSERT INTO products (name, price) VALUES (?,?)";
@@ -24,16 +26,13 @@ const createProducts = async (req, res) => {
             price,
         },
     });
-};
+});
 
-const getProductById = async (req, res) => {
+const getProductById = asycnHandler( async (req, res) => {
     const { id } = req.params;
 
-    if (isNaN(id) || parseInt(id) <= 0) {
-        return res.status(400).json({
-            success: false,
-            message: "Format ID salah",
-        });
+   if (isNaN(id) || parseInt(id) <= 0) {
+        return next(new AppError("Format ID salah", 400));
     }
 
     try {
@@ -55,16 +54,13 @@ const getProductById = async (req, res) => {
             message: "Terjadi kesalahan pada internal server",
         });
     }
-};
+});
 
-const deleteProducts = async (req, res) => {
+const deleteProducts = asycnHandler( async (req, res) => {
     const { id } = req.params;
 
-    if (isNaN(id) || parseInt(id) <= 0) {
-        return res.status(400).json({
-            success: false,
-            message: "Format ID salah",
-        });
+   if (isNaN(id) || parseInt(id) <= 0) {
+        return next(new AppError("Format ID salah", 400));
     }
 
     try {
@@ -86,9 +82,9 @@ const deleteProducts = async (req, res) => {
             message: "Terjadi kesalahan internal pada server",
         });
     }
-};
+});
 
-const updateProducts = async (req, res) => {
+const updateProducts = asycnHandler( async (req, res) => {
     const { id } = req.params;
     const { name, price } = req.body;
 
@@ -117,6 +113,6 @@ const updateProducts = async (req, res) => {
     } catch (error) {
         console.error("Terjadi error saat update:", error.message);
     }
-};
+});
 
 module.exports = { createProducts, getProducts, getProductById, deleteProducts, updateProducts };
