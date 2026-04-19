@@ -8,8 +8,10 @@ const jwt = require("jsonwebtoken");
 const register = asyncHandler(async (req, res) => {
     const { username, email, password } = req.body;
 
+    console.log(req.body);
     // 1. cek email sudah terdaftar?
     const [existingUser] = await db.execute("SELECT email FROM users WHERE email = ?", [email]);
+console.log(existingUser.length);
 
     if (existingUser.length > 0) {
         throw new AppError("Email sudah didaftarkan!", 400);
@@ -22,6 +24,8 @@ const register = asyncHandler(async (req, res) => {
 
     // 3. simpan ke database
     const [result] = await db.execute("INSERT INTO users (username, email, password) VALUES (?,?,?)", [username, email, hashPassword]);
+
+
 
     res.status(201).json({
         success: true,
@@ -49,7 +53,7 @@ const login = asyncHandler(async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
         throw new AppError("Email atau Password salah", 401);
-    }
+    }       
 
     // 3. Buat Token JWT
     const token = jwt.sign(

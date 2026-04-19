@@ -3,6 +3,7 @@ const appError = require("../utils/AppError");
 const pool = require("../config/db");
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
+require('dotenv').config()
 
 const register = asyncHandler(async (req, res) => {
     const { username, email, password } = req.body;
@@ -74,5 +75,36 @@ const login = asyncHandler(async (req, res) => {
         },
     });
 });
+
+const protect = asyncHandler( async (req, res) => {
+    const authHeader = req.headers.authorization;
+    let token;
+
+    if (authHeader?.startWith('Bearer')) {
+        token = authHeader.split('')[1];
+    }
+
+    if (!token) {
+        throw new appError("Silahkan login untuk mengakses halaman ini!", 401)
+    }
+
+    try {
+        // verifikasi token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        // cek user masih ada di database
+        const [users] = await pool.execute('SELECT id, username, email FROM users WHERE id = ?', [decoded.id])
+
+        if (users.length === 0) {
+            throw new appError("User pemilik token sudah tidak daftar", 401)
+        }
+
+        // simpan ke req.user agar bisa diakses controller berikutnya
+        req.user = users[0]
+        next();
+    } catch (error) {
+        throw new appError("Token tidak valid atau kadaluarwa", 401)
+    }
+
+})
 
 module.exports = { login, register };

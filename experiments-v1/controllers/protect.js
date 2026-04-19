@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const {asyncHandler} = require('../utils/asyncHandler')
 
 const protect = asyncHandler(async (req, res, next) => {
     let token;
@@ -15,7 +16,7 @@ const protect = asyncHandler(async (req, res, next) => {
             // 3. Ambil data user dari DB (buang password-nya demi keamanan)
             const [users] = await db.execute(
                 "SELECT id, username, email FROM users WHERE id = ?", 
-                [decoded.id]
+                [decoded.id]    
             );
 
             if (users.length === 0) {
@@ -24,6 +25,9 @@ const protect = asyncHandler(async (req, res, next) => {
 
             // 4. SIMPAN DATA USER KE REQ (Ini bagian paling sakti!)
             req.user = users[0];
+
+            console.log(req.user);
+            
 
             next(); // Lanjut ke Controller
         } catch (error) {
