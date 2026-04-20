@@ -38,3 +38,5 @@ const protect = asyncHandler(async (req, res, next) => {
         throw new AppError("Token tidak valid atau kadaluwarsa", 401);
     }
 });
+
+module.exports = {protect}
