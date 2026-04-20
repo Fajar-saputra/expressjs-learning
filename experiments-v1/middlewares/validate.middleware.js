@@ -1,3 +1,28 @@
+// JOI
+// const validate = (schema) => (req, res, next) => {
+//   // Joi memvalidasi data dan mengembalikan objek { error, value }
+//   const { error, value } = schema.validate({
+//     body: req.body,
+//     params: req.params,
+//     query: req.query
+//   }, { abortEarly: false }); // agar semua error muncul sekaligus
+
+//   if (error) {
+//     // Jika ada error, kirim respon 400
+//     return res.status(400).json({
+//       success: false,
+//       message: "Validasi Joi Gagal",
+//       details: error.details
+//     });
+//   }
+
+//   // Jika sukses, timpa data dengan yang sudah bersih (value)
+//   req.body = value.body;
+//   next();
+// };
+
+
+// ZOD
   const validate = (schema) => (req, res, next) => {
     try {
       const validatedData = schema.parse({
