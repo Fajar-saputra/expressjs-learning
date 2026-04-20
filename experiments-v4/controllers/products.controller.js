@@ -1,6 +1,6 @@
 const db = require("./db");
 const { asycnHandler } = require("./middlewares/asyncHandler");
-const { AppError } = require("./utils/AppError");
+const { AppError } = require("../utils/AppError");
 
 const getProducts = async (req, res) => {
     const [products] = await db.query("SELECT * from products");
@@ -12,7 +12,7 @@ const getProducts = async (req, res) => {
     });
 };
 
-const createProducts = asycnHandler( async (req, res) => {
+const createProducts = asycnHandler(async (req, res) => {
     const { name, price } = req.body;
 
     const sql = "INSERT INTO products (name, price) VALUES (?,?)";
@@ -28,10 +28,10 @@ const createProducts = asycnHandler( async (req, res) => {
     });
 });
 
-const getProductById = asycnHandler( async (req, res) => {
+const getProductById = asycnHandler(async (req, res) => {
     const { id } = req.params;
 
-   if (isNaN(id) || parseInt(id) <= 0) {
+    if (isNaN(id) || parseInt(id) <= 0) {
         return next(new AppError("Format ID salah", 400));
     }
 
@@ -56,10 +56,10 @@ const getProductById = asycnHandler( async (req, res) => {
     }
 });
 
-const deleteProducts = asycnHandler( async (req, res) => {
+const deleteProducts = asycnHandler(async (req, res) => {
     const { id } = req.params;
 
-   if (isNaN(id) || parseInt(id) <= 0) {
+    if (isNaN(id) || parseInt(id) <= 0) {
         return next(new AppError("Format ID salah", 400));
     }
 
@@ -84,7 +84,7 @@ const deleteProducts = asycnHandler( async (req, res) => {
     }
 });
 
-const updateProducts = asycnHandler( async (req, res) => {
+const updateProducts = asycnHandler(async (req, res) => {
     const { id } = req.params;
     const { name, price } = req.body;
 
