@@ -1,8 +1,8 @@
 const express = require("express");
-const { getProducts, createProducts, getProductById, deleteProducts, updateProducts } = require("../controllers/products.controller");
-const validate = require("./validate");
-const { schemaProduct } = require("../schema/skemaProducts");
 const router = express();
+const { getProducts, createProducts, getProductById, deleteProducts, updateProducts } = require("../controllers/products.controller");
+const {validate} = require("../middlewares/validate.middleware");
+const { schemaProduct } = require("../schema/skemaProducts");
 
 router.get("/products", getProducts);
 router.get("/products/:id", getProductById);

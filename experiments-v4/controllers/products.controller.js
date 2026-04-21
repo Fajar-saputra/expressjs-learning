@@ -1,5 +1,5 @@
-const db = require("./db");
-const { asycnHandler } = require("./middlewares/asyncHandler");
+const {db} = require("../config/db");
+const { asycnHandler } = require("../utils/asyncHandler");
 const { AppError } = require("../utils/AppError");
 
 const getProducts = async (req, res) => {
