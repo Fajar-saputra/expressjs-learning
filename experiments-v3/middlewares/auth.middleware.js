@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
-const asyncHandler = require('../utils/asyncHandler');
-const AppErr = require('../utils/appError');
+const { AppErr } = require('../utils/appError');
+const {asyncHandlerv1} = require('../utils/asyncHandler')
 
-const protect = asyncHandler(async (req, res, next) => {
+const protect = asyncHandlerv1(async (req, res, next) => {
   let token;
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];

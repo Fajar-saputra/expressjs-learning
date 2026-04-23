@@ -1,10 +1,10 @@
 const db = require("../config/db");
-const AppError = require("../utils/appError");
-const asyncHandler = require("../utils/asyncHandler");
+const {AppError} = require("../utils/appError");
+const {asyncHandlerv1} = require("../utils/asyncHandler");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-const register = asyncHandler(async (req, res) => {
+const register = asyncHandlerv1(async (req, res) => {
     const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
@@ -24,7 +24,7 @@ const register = asyncHandler(async (req, res) => {
     });
 });
 
-const login = asyncHandler(async (req, res) => {
+const login = asyncHandlerv1(async (req, res) => {
     const { email, password } = req.body;
 
     const [result] = await db.query("SELECT email FROM users WHERE email  = ?", [email]);
