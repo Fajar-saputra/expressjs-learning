@@ -1,6 +1,7 @@
 const db = require("../config/db");
 const { AppError } = require("../utils/appError");
 const { asyncHandlerv1 } = require("../utils/asyncHandler");
+const { successResponse } = require("../utils/response");
 
 const getProducts = asyncHandlerv1(async (req, res) => {
     const [rows] = await db.execute("SELECT * FROM product");
@@ -13,11 +14,13 @@ const getProducts = asyncHandlerv1(async (req, res) => {
         });
     }
 
-    res.status(200).json({
-        success: true,
-        message: "Data berhasil diambil",
-        data: rows,
-    });
+    // res.status(200).json({
+    //     success: true,
+    //     message: "Data berhasil diambil",
+    //     data: rows,
+    // });
+
+    successResponse(res, rows, "Berhasil ambil data", 200)
 });
 
 const getProductByID = asyncHandlerv1(async (req, res) => {
@@ -45,11 +48,13 @@ const createProducts = asyncHandlerv1(async (req, res) => {
 
     const [result] = await db.execute("INSERT INTO product (name, price, description) VALUES (?,?,?)", [name, price, description]);
 
-    res.status(201).json({
-        success: true,
-        message: "Berhasil create product",
-        data: result,
-    });
+    successResponse(res, result, "Berhasil ambil data product", 201)
+
+    // res.status(201).json({
+    //     success: true,
+    //     message: "Berhasil create product",
+    //     data: result,
+    // });
 });
 
 const updateProduct = asyncHandlerv1(async (req, res) => {

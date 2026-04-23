@@ -1,16 +1,15 @@
 const express = require("express");
 const app = express();
+require("dotenv").config();
 
-const PORT = 3000;
+const port = process.env.PORT;
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }))
-
+app.use(express.urlencoded({ extended: true }));
 
 const productsRoutes = require("./routes/products.router");
 
-
 app.use("/api", productsRoutes);
 
-app.listen(PORT, () => {
-    console.log("server runing");
+app.listen(port, () => {
+    console.log(`server runing port ${port}`);
 });
