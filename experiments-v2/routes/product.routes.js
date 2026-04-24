@@ -6,10 +6,10 @@ const {validate} = require('../middlewares/validate.middleware')
 const {productSchema} = require('../validation/productSchema')
 
 
-router.get('/product', getProducts)     
-router.get('/product/:id', getProductById)
-router.post('/product', validate(productSchema), createProduct)
-router.delete('/product/:id', deleteProduct)
-router.patch('/product/:id', updateProduct)
+router.get('/products', getProducts)     
+router.get('/products/:id', getProductById)
+router.post('/products', validate(productSchema), createProduct)
+router.delete('/products/:id', deleteProduct)
+router.patch('/products/:id', updateProduct)
 
 module.exports = router

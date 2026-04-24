@@ -1,15 +1,15 @@
-const asyncHandler = require("../utils/asyncHandler");
-const appError = require("../utils/AppError");
-const pool = require("../config/db");
+const {asyncHandlerv2} = require("../utils/asyncHandler");
+const {AppError} = require("../utils/AppError");
+const {db} = require("../config/db");
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 require('dotenv').config()
 
-const register = asyncHandler(async (req, res) => {
+const register = asyncHandlerv2(async (req, res) => {
     const { username, email, password } = req.body;
 
     // chcek user
-    const [existingUser] = await pool.execute("SELECT email FROM users WHERE email =? ", [email]);
+    const [existingUser] = await db.execute("SELECT email FROM users WHERE email =? ", [email]);
 
     if (existingUser.length > 0) {
         throw new appError("Email sudah terdaftar!", 400);
@@ -20,7 +20,7 @@ const register = asyncHandler(async (req, res) => {
     const hashPassword = await bcrypt.hash(password, salt);
 
     // simpan ke database
-    const [result] = await pool.execute("INSERT INTO users (username, email, password) VALUES (?,?,?)", [username, email, hashPassword]);
+    const [result] = await db.execute("INSERT INTO users (username, email, password) VALUES (?,?,?)", [username, email, hashPassword]);
 
     // respon
     res.status(201).json({
@@ -33,11 +33,11 @@ const register = asyncHandler(async (req, res) => {
     });
 });
 
-const login = asyncHandler(async (req, res) => {
+const login = asyncHandlerv2(async (req, res) => {
     const { email, password } = req.body;
 
     // check email
-    const [users] = await pool.execute("SELECT * FROM users WHERE email = ?", [email]);
+    const [users] = await db.execute("SELECT * FROM users WHERE email = ?", [email]);
 
     if (users.length === 0) {
         // return res.status(200).json({
@@ -76,7 +76,7 @@ const login = asyncHandler(async (req, res) => {
     });
 });
 
-const protect = asyncHandler( async (req, res) => {
+const protect = asyncHandlerv2( async (req, res) => {
     const authHeader = req.headers.authorization;
     let token;
 
@@ -92,7 +92,7 @@ const protect = asyncHandler( async (req, res) => {
         // verifikasi token
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
         // cek user masih ada di database
-        const [users] = await pool.execute('SELECT id, username, email FROM users WHERE id = ?', [decoded.id])
+        const [users] = await db.execute('SELECT id, username, email FROM users WHERE id = ?', [decoded.id])
 
         if (users.length === 0) {
             throw new appError("User pemilik token sudah tidak daftar", 401)

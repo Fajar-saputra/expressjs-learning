@@ -1,105 +1,65 @@
-const appError = require("../utils/AppError");
-const asyncHandler = require("../utils/asyncHandler");
-const pool = require("../config/db");
+const { AppError } = require("../utils/AppError");
+const { asyncHandlerv2 } = require("../utils/asyncHandler");
+const { db } = require("../config/db");
+const { successRespon, errorRespon } = require("../utils/respon");
 
-const getProducts = asyncHandler(async (req, res) => {
-    const [rows] = await pool.execute("SELECT * FROM product");
+const getProducts = asyncHandlerv2(async (req, res) => {
+    const [rows] = await db.execute("SELECT * FROM product");
 
     if (rows.length === 0) {
-        return res.status(200).json({
-            success: true,
-            message: "data product masih kosong!!",
-            data: [],
-        });
+        throw new AppError("Data product kosong", 404);
     }
-
-    res.status(200).json({
-        success: true,
-        message: "berhasil ambil data product",
-        data: rows,
-    });
+    successRespon(res, rows, "Data product berhasil diambil");
 });
 
-const getProductById = asyncHandler(async (req, res) => {
+const getProductById = asyncHandlerv2(async (req, res) => {
     const { id } = req.params;
 
-    const [rows] = await pool.execute("SELECT * FROM product WHERE id = ?", [id]);
+    const [rows] = await db.execute("SELECT * FROM product WHERE id = ?", [id]);
 
     if (rows.length === 0) {
-        throw new appError("product tidak ditemukan", 404);
+        throw new AppError("product tidak ditemukan", 404);
     }
 
-    res.status(200).json({
-        success: true,
-        message: "data berhasil diambil",
-        data: rows,
-    });
+    successRespon(res, rows, "Data product berhasil diambil");
 });
 
-const createProduct = asyncHandler(async (req, res) => { 
+const createProduct = asyncHandlerv2(async (req, res) => {
     const { name, description, price } = req.body;
 
-    if (!name || price === undefined ) {
-        return res.status(400).json({
-            success: false,
-            message: "name, price, wajib diisi"
-        });
-    }
+    const [result] = await db.execute("INSERT INTO product (name, description, price) VALUES (?,?,?)", [name, description || null, price]);
 
-    const [result] = await pool.execute(
-        "INSERT INTO product (name, description, price) VALUES (?,?,?)",
-        [name, description || null, price]
-    );
-
-    res.status(201).json({
-        success: true,
-        message: "berhasil membuat product baru!",
-        data: {
-            id: result.insertId,
-            name,
-            description,
-            price,
-        },
-    });
+    successRespon(res, { id: result.insertId, name, price, description }, "Data product berhasil ditambah", 201);
 });
 
-const deleteProduct = asyncHandler(async (req, res) => {
+const deleteProduct = asyncHandlerv2(async (req, res) => {
     const { id } = req.params;
 
-    // cek id
-    const [rows] = await pool.execute('SELECT * FROM product WHERE id = ? ', [id])
+    const [result] = await db.execute("DELETE FROM product WHERE id = ?", [id]);
 
-    if (rows.length === 0) {
-        throw new appError("ID tidak ditemukan!", 404)
+    if (result.affectedRows === 0) {
+        throw new Error("Product tidak ditemukan", 404);
     }
 
-    const [result] = await pool.execute("DELETE FROM product WHERE id = ?", [id])
+    successRespon(res, null, "Data product berhasil dihapus");
+});
 
-    res.status(200).json({
-        success: true,
-        message: `berhasil menghapus product ID: ${id}`
-    })
-})
-
-const updateProduct = asyncHandler(async (req, res) => {
+const updateProduct = asyncHandlerv2(async (req, res) => {
     const { id } = req.params;
     const { name, description, price } = req.body;
-
-    // cek data ada tidak?
-    const [rows] = await pool.execute('SELECT * FROM product WHERE id = ?', [id])
-
-    if (rows.length === 0) {
-        throw new appError("product tidak ditemukan", 404)
-    }
 
     // ubah data
-    const [result] = await pool.execute('UPDATE  product SET name = COALESCE(?, name), description =COALESCE(?, description), price= COALESCE(?, price)', [name || null, description || null, price || null])
+    const [result] = await db.execute("UPDATE  product SET name = COALESCE(?, name), description =COALESCE(?, description), price= COALESCE(?, price)", [
+        name || null,
+        description || null,
+        price || null,
+    ]);
 
-    res.status(200).json({
-        success: true,
-        message: `berhasil update ID: ${id}`,
-        changed: result.changedRows > 0
-    })
-})
+    if (result.affectedRows === 0) {
+        throw new Error("Product tidak ditemukan", 404);
+    }
 
-module.exports = { getProducts, getProductById, createProduct, deleteProduct, updateProduct };
+    successRespon(res, result, "Data product berhasil diambil");
+});
+
+module.exports = { getProducts, getProductById, createProduct, updateProduct, deleteProduct };
