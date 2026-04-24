@@ -1,13 +1,17 @@
 const express = require("express");
 const app = express();
-const authRoutes = require("./routes/auth.routes");
+require("dotenv").config();
+const { errorHandler } = require("./middlewares/error.middleware");
 
 app.use(express.json());
 
+const produtsRoutes = require("./routes/products.routes");
 // Routing
-app.use("/auth", authRoutes);
+app.use("/api", produtsRoutes);
+
+app.use(errorHandler);
 
 // Start server
-app.listen(3000, () => {
-  console.log("Server running on port 5000");
+app.listen(process.env.PORT, () => {
+    console.log("Server running on port 5000");
 });

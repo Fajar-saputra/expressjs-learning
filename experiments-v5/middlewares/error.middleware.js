@@ -1,5 +1,12 @@
 const errorHandler = (err, req, res, next) => {
-    const statusCode = err.statusCode || "500";
+    // Debugging: Lihat objek asli di terminal
+    console.log("=== ERROR LOG ===");
+    console.error("Name:", err.name);
+    console.error("Message:", err.message);
+    console.error("Status Code:", err.statusCode);
+    console.log("=================");
+
+    const statusCode = err.statusCode || 500;
 
     res.status(statusCode).json({
         success: "error",
@@ -7,4 +14,4 @@ const errorHandler = (err, req, res, next) => {
     });
 };
 
-module.exports = { errorHandler };
+module.exports = {errorHandler}

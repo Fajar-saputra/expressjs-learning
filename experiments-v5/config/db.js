@@ -8,5 +8,14 @@ const db = mysql.createPool({
     database: process.env.DB_NAME,
 });
 
+db.getConnection()
+    .then((conn) => {
+        console.log("Terhubung ke database");
+        conn.release();
+    })
+    .catch((err) => {
+        console.log("Koneksi database gagal : ", err);
+    });
+
 module.exports = {db};
     
