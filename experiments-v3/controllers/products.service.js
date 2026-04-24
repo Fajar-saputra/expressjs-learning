@@ -2,6 +2,13 @@ const { db } = require("../config/db");
 const { asyncHandlerv1 } = require("../utils/asyncHandler");
 
 const getProductAllPagination = asyncHandlerv1(async (req, res) => {
+    // format query sql kita Susu Fufufafa Wajib Ganti, Hari Order Libur
+    // SELECT * FROM produk        -- (S)usu (F)ufufafa
+    // WHERE 1 = 1                 -- (W)ajib (Mulai filter)
+    //   AND nama LIKE '%sepatu%'  -- (W)ajib (Kriteria 1)
+    //   AND category = 'sport'    -- (W)ajib (Kriteria 2)
+    // ORDER BY harga DESC         -- (H)ari (O)rder
+    // LIMIT 10 OFFSET 0;          -- (L)ibur
     // 1. Ambil data dari req.query (bukan params)
     let { page = 1, limit = 10, search = "", category = "", sortBy = "id", order = "ASC" } = req.query;
 

@@ -1,17 +1,17 @@
 const { db } = require("../config/db");
 const { AppError } = require("../utils/AppError");
 const { asyncHandlerv1 } = require("../utils/asyncHandler");
-const { successResponse, errorResponse } = require("../utils/respon");
+const { successResponse, errorResponse } = require("../utils/response");
 
 const getProducts = asyncHandlerv1(async (req, res) => {
-    const [products] = await db.execute("SELECT * from product");
+    const [products] = await db.execute("SELECT * from products");
 
     successResponse(res, products, "Product berhasil diambil", 200);
 });
 
 const getProductById = asyncHandlerv1(async (req, res) => {
     const { productId } = req.params;
-    const [rows] = await db.execute("SELECT * FROM product WHERE id = ?", [productId]);
+    const [rows] = await db.execute("SELECT * FROM products WHERE id = ?", [productId]);
 
     if (rows.length === 0) {
         throw new AppError("Product tidak ditemukan", 404);
@@ -22,7 +22,7 @@ const getProductById = asyncHandlerv1(async (req, res) => {
 
 const createProducts = asyncHandlerv1(async (req, res) => {
     const { name, price, description } = req.body;
-    const [result] = await db.execute("INSERT INTO product (name, price, description) VALUES (?,?,?)", [name, price, description]);
+    const [result] = await db.execute("INSERT INTO products (name, price, description) VALUES (?,?,?)", [name, price, description]);
 
     successResponse(res, { id: result.insertId, name }, "Product berhasil ditambahkan", 201);
 });
@@ -32,7 +32,7 @@ const updateProducts = asyncHandlerv1(async (req, res) => {
     const { name, price, description } = req.body;
 
     const sql = `
-        UPDATE product 
+        UPDATE products 
         SET 
         name = COALESCE(?, name), 
         price = COALESCE(?, price), 
@@ -51,7 +51,7 @@ const updateProducts = asyncHandlerv1(async (req, res) => {
 
 const deleteProducts = asyncHandlerv1(async (req, res) => {
     const { productId } = req.params;
-    const [result] = await db.execute("DELETE FROM product WHERE id = ?", [productId]);
+    const [result] = await db.execute("DELETE FROM products WHERE id = ?", [productId]);
 
     if (result.affectedRows === 0) {
         throw new AppError("Product tidak ditemukan atau gagal dihapus", 404);

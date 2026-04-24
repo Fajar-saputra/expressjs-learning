@@ -10,7 +10,11 @@ const {
     deleteProducts,
     updateProducts
 } = require("../controllers/products.controller");
+const { getProductPagination } = require("../controllers/product.services");
 
+
+// pagination
+router.get("/products/pagination", getProductPagination)
 
 // route umum
 router.get("/products", getProducts);
