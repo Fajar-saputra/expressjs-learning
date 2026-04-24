@@ -1,4 +1,4 @@
-const validate = (schema, source = 'body') => {
+const validate = (schema, source = "body") => {
     return (req, res, next) => {
         // req['body'] atau req['params']
         const { error, value } = schema.validate(req[source]);
@@ -7,7 +7,7 @@ const validate = (schema, source = 'body') => {
             return res.status(400).json({
                 success: false,
                 // Mengambil pesan pertama saja supaya user tidak pusing
-                message: error.details[0].message 
+                message: error.details[0].message,
             });
         }
 
@@ -17,4 +17,4 @@ const validate = (schema, source = 'body') => {
     };
 };
 
-module.exports = {validate}
+module.exports = { validate };
