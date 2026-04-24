@@ -1,16 +1,20 @@
 const express = require("express");
 const router = express.Router();
+const { validate } = require("../middlewares/validate.middleware");
 const { getProducts, createProducts, getProductByID, deleteProductByID, updateProduct } = require("../controllers/products.controller");
 const { schemaProduct, schemaParams } = require("../schema/schema");
-const { validate } = require("../middlewares/validate.middleware");
+const { getProductAllPagination } = require("../controllers/products.service");
 
+// route spesifik
+router.get("/products/pagination", getProductAllPagination);
+
+// route umum
 router.get("/products", getProducts);
-router.get("/products/:id", validate(schemaParams, "params"), getProductByID);
 router.post("/products", validate(schemaProduct, "body"), createProducts);
-router.patch("/products/:id",
-    validate(schemaParams, "params"),
-    validate(schemaProduct, 'body'),
-    updateProduct);
-router.delete("/products/:id", validate(schemaParams, "params"), deleteProductByID);
+
+// route dengnan parameter
+router.get("/products/:productId", validate(schemaParams, "params"), getProductByID);
+router.delete("/products/:productId", validate(schemaParams, "params"), deleteProductByID);
+router.patch("/products/:productId", validate(schemaParams, "params"), validate(schemaProduct, "body"), updateProduct);
 
 module.exports = router;

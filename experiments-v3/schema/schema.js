@@ -24,7 +24,7 @@ price: Joi.number()
 
 
 const schemaParams = Joi.object({
-    id: Joi.number().integer().positive().required().messages({
+    productId: Joi.number().integer().positive().required().messages({
         'number.base': 'ID harus berupa angka',
         'any.required': 'ID diperlukan'
     })

@@ -1,95 +1,67 @@
-const db = require("../config/db");
+const { db } = require("../config/db");
 const { AppError } = require("../utils/appError");
 const { asyncHandlerv1 } = require("../utils/asyncHandler");
 const { successResponse } = require("../utils/response");
 
 const getProducts = asyncHandlerv1(async (req, res) => {
-    const [rows] = await db.execute("SELECT * FROM product");
+    // Tambahkan pagination sebagai standar industri
+    const limit = parseInt(req.query.limit) || 10;
+    const page = parseInt(req.query.page) || 1;
+    const offset = (page - 1) * limit;
 
-    if (rows.length === 0) {
-        return res.status(200).json({
-            success: true,
-            message: "Data products masih kosong!",
-            data: [],
-        });
-    }
+    const [rows] = await db.execute("SELECT * FROM product LIMIT ? OFFSET ?", [limit.toString(), offset.toString()]);
 
-    // res.status(200).json({
-    //     success: true,
-    //     message: "Data berhasil diambil",
-    //     data: rows,
-    // });
-
-    successResponse(res, rows, "Berhasil ambil data", 200)
+    successResponse(res, rows, "Berhasil mengambil data produk");
 });
 
 const getProductByID = asyncHandlerv1(async (req, res) => {
-    const { id } = req.params;
+    const { productId } = req.params;
 
-    if (isNaN(id) || parseInt(id).length === 0) {
-        throw new Error("Format ID tidak valid", 400);
-    }
-
-    const [rows] = await db.execute("SELECT * FROM product WHERE id = ?", [id]);
+    const [rows] = await db.execute("SELECT * FROM product WHERE id = ?", [productId]);
 
     if (rows.length === 0) {
-        throw new AppError("Product tidak ditemukan", 404);
+        throw new AppError("Produk tidak ditemukan", 404);
     }
 
-    res.status(200).json({
-        success: true,
-        message: `Berhasil ambil data product by ID ${id}`,
-        data: rows[0],
-    });
+    successResponse(res, rows[0], `Berhasil mengambil produk ID ${productId}`);
 });
 
 const createProducts = asyncHandlerv1(async (req, res) => {
     const { name, price, description } = req.body;
 
-    const [result] = await db.execute("INSERT INTO product (name, price, description) VALUES (?,?,?)", [name, price, description]);
+    const [result] = await db.execute("INSERT INTO product (name, price, description) VALUES (?,?,?)", [name, price, description || null]);
 
-    successResponse(res, result, "Berhasil ambil data product", 201)
-
-    // res.status(201).json({
-    //     success: true,
-    //     message: "Berhasil create product",
-    //     data: result,
-    // });
+    successResponse(res, { id: result.insertId, name, price }, "Produk berhasil ditambahkan", 201);
 });
 
 const updateProduct = asyncHandlerv1(async (req, res) => {
     const { name, price, description } = req.body;
-    const { id } = req.params;
+    const { productId } = req.params;
 
-    const [result] = await db.execute(
-        "UPDATE product SET name = COALESCE(?, name), price = COALESCE(?, price), description = COALESCE(?, description) WHERE id = ?", 
-        [name || null, price || null, description || null, id]
-    );
+    const [result] = await db.execute("UPDATE product SET name = COALESCE(?, name), price = COALESCE(?, price), description = COALESCE(?, description) WHERE id = ?", [
+        name || null,
+        price || null,
+        description || null,
+        productId,
+    ]);
 
-    // Cek apakah ada baris yang berubah
     if (result.affectedRows === 0) {
-        throw new AppError("Product tidak ditemukan atau tidak ada perubahan", 404);
+        throw new AppError("Produk gagal diperbarui (ID tidak ditemukan)", 404);
     }
 
-    res.status(200).json({
-        success: true,
-        message: "Berhasil update product",
-    });
+    successResponse(res, result, "Produk berhasil diperbarui");
 });
 
 const deleteProductByID = asyncHandlerv1(async (req, res) => {
-    const { id } = req.params;
+    const { productId } = req.params;
 
-    const [result] = await db.execute("DELETE FROM product WHERE id = ?", [id]);
+    const [result] = await db.execute("DELETE FROM product WHERE id = ?", [productId]);
 
     if (result.affectedRows === 0) {
-        throw new AppError("Product gagal dihapus atau tidak ditemukan", 404);
+        throw new AppError("Produk tidak ditemukan", 404);
     }
 
-    res.status(200).json({
-        success: true,
-        message: `Berhasil hapus product ID ${id}`,
-    });
+    successResponse(res, null, `Berhasil menghapus produk ID ${productId}`);
 });
 
 module.exports = { getProducts, createProducts, getProductByID, deleteProductByID, updateProduct };

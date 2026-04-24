@@ -17,4 +17,4 @@ db.getConnection()
         console.error('Koneksi database gagal:', err.message);
     });
 
-module.exports = db;
+module.exports = {db};
