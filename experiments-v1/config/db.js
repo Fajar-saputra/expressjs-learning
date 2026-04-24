@@ -1,5 +1,5 @@
-const mysql = require("mysql2/promise")
-require('dotenv').config()
+const mysql = require("mysql2/promise");
+require("dotenv").config();
 
 const db = mysql.createPool({
     host: process.env.DB_HOST,
@@ -11,4 +11,13 @@ const db = mysql.createPool({
     queueLimit: 0,
 });
 
-module.exports = db;
+db.getConnection()
+    .then((conn) => {
+        console.log("Berhasil terhubung");
+        conn.release();
+    })
+    .catch((err) => {
+        console.log("Koneksi database gagal : ", err);
+    });
+
+module.exports = { db };

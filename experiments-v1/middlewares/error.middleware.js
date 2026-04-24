@@ -1,4 +1,4 @@
-const errorHanddler = (err, req, res, next) => {
+const errorHandler = (err, req, res, next) => {
     const statusCode = err.statusCode || 500;
 
     res.status(statusCode).json({
@@ -7,4 +7,4 @@ const errorHanddler = (err, req, res, next) => {
     })
 }
 
-module.exports = errorHandler;
+module.exports = {errorHandler};

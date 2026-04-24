@@ -9,7 +9,7 @@ app.use(express.json())
 
 app.use(userRoutes)
 app.use(authRoutes)
-app.use(handleError)
+// app.use(handleError)
 
 
 app.listen(3000, () => {

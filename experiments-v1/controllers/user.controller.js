@@ -1,8 +1,8 @@
 const {AppError} = require("../utils/appError");
-const {asyncHandler} = require("../utils/asyncHandler");  
+const {asyncHandlerv1} = require("../utils/asyncHandler");  
 const db = require("../config/db");
 
-const getUsers = asyncHandler(async (req, res) => {
+const getUsers = asyncHandlerv1(async (req, res) => {
     const [rows] = await db.execute('SELECT * FROM  users');
 
     if (rows.length === 0) {
@@ -21,7 +21,7 @@ const getUsers = asyncHandler(async (req, res) => {
     
 });
 
-const getUserById = asyncHandler(async (req, res) => {
+const getUserById = asyncHandlerv1(async (req, res) => {
     const { id } = req.params;
 
     const [rows] = await db.execute(
@@ -45,7 +45,7 @@ const getUserById = asyncHandler(async (req, res) => {
     });
 });
 
-const createUsers = asyncHandler( async (req, res) => {
+const createUsers = asyncHandlerv1( async (req, res) => {
     const { username, email, password } = req.body;
 
     const [result] = await db.execute("INSERT INTO users (username, email, password) VALUES (?,?,?)", [username, email, password])
@@ -61,7 +61,7 @@ const createUsers = asyncHandler( async (req, res) => {
     })
 })
 
-const updateUser = asyncHandler(async (req, res) => {
+const updateUser = asyncHandlerv1(async (req, res) => {
     const { id } = req.params;
     const { username, email, password } = req.body;
 
@@ -85,7 +85,7 @@ const updateUser = asyncHandler(async (req, res) => {
 
 })
 
-const deleteUser = asyncHandler(async (req, res) => {
+const deleteUser = asyncHandlerv1(async (req, res) => {
     const { id } = req.params;
 
     const [result] = await db.execute("DELETE FROM users WHERE id = ?", [id])

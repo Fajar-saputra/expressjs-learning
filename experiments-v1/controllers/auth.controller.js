@@ -1,11 +1,11 @@
-const { asyncHandler } = require("../utils/asyncHandler");
-const db = require("../config/db");
+const { asyncHandlerv1 } = require("../utils/asyncHandler");
+const {db} = require("../config/db");
 const { AppError } = require("../utils/appError");
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const register = asyncHandler(async (req, res) => {
+const register = asyncHandlerv1(async (req, res) => {
     const { username, email, password } = req.body;
 
     console.log(req.body);
@@ -36,7 +36,7 @@ const register = asyncHandler(async (req, res) => {
     });
 });
 
-const login = asyncHandler(async (req, res) => {
+const login = asyncHandlerv1(async (req, res) => {
     const { email, password } = req.body;
 
     // 1. Cari user berdasarkan email
@@ -53,7 +53,7 @@ const login = asyncHandler(async (req, res) => {
         throw new AppError("Email atau Password salah", 401);
     }
 
-    // 3. Buat Token JWT
+    // 3. Buat Token {JWT}
     const token = jwt.sign(
         { id: user.id, username: user.username }, // Payload (data yang disimpan)
         process.env.JWT_SECRET, // Kunci rahasia (simpan di .env)
@@ -67,10 +67,7 @@ const login = asyncHandler(async (req, res) => {
     });
 });
 
-const jwt = require("jsonwebtoken");
-const { asyncHandler } = require("./asyncHandler");
-
-const protect = asyncHandler(async (req, res, next) => {
+const protect = asyncHandlerv1(async (req, res, next) => {
     let token;
 
     // Langsung usir jika header tidak ada atau format salah
