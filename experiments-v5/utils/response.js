@@ -1,4 +1,4 @@
-const successRespon = (res, data, message = "OK", statusCode = 200, meta = null) => {
+const successResponse = (res, data, message = "OK", statusCode = 200, meta = null) => {
     return res.status(statusCode).json({
         succces: true,
         message,
@@ -7,7 +7,7 @@ const successRespon = (res, data, message = "OK", statusCode = 200, meta = null)
     })
 }
 
-const errorRespon = (res, data, message = "Error", statusCode = 400, meta = null) => {
+const errorResponse = (res, data, message = "Error", statusCode = 400, meta = null) => {
     return res.status(statusCode).json({
         succces: true,
         message,
@@ -17,4 +17,4 @@ const errorRespon = (res, data, message = "Error", statusCode = 400, meta = null
     })
 }
 
-module.exports = {successRespon, errorRespon}
+module.exports = {successResponse, errorResponse}
