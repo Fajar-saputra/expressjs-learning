@@ -49,7 +49,7 @@ const getProductPagination = asyncHandlerv1(async (req, res) => {
     const [rows] = await db.execute(sql, values);
 
     // total halaman
-    let countSql = "SELECT COUNT(*) as total FROM products WHERE 1=1 ";
+    let countSql = "SELECT COUNT(*) AS total FROM products WHERE 1=1 ";
     let countParams = [];
 
     if (search) {
