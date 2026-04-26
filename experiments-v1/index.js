@@ -4,9 +4,13 @@ const app = express();
 const userRoutes = require('./routers/user.router')
 const authRoutes = require('./routers/auth.router')
 const productsRoutes = require('./routers/products.routes')
-const {errorHandler} = require("./middlewares/error.middleware")
+const { errorHandler } = require("./middlewares/error.middleware")
  
 app.use(express.json())
+
+app.get('/', (req, res) => {
+  res.send('Server Backend Berhasil Jalan!');
+});
 
 app.use('/api', userRoutes)
 app.use('/api', authRoutes)
