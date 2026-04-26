@@ -3,13 +3,15 @@ const app = express();
 
 const userRoutes = require('./routers/user.router')
 const authRoutes = require('./routers/auth.router')
-const handleError = require("./middlewares/error.middleware")
+const productsRoutes = require('./routers/products.routes')
+const {errorHandler} = require("./middlewares/error.middleware")
  
 app.use(express.json())
 
-app.use(userRoutes)
-app.use(authRoutes)
-// app.use(handleError)
+app.use('/api', userRoutes)
+app.use('/api', authRoutes)
+app.use('/api', productsRoutes)
+app.use(errorHandler)
 
 
 app.listen(3000, () => {

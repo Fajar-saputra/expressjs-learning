@@ -1,63 +1,56 @@
-// JOI
-// const validate = (schema) => (req, res, next) => {
-//   // Joi memvalidasi data dan mengembalikan objek { error, value }
-//   const { error, value } = schema.validate({
-//     body: req.body,
-//     params: req.params,
-//     query: req.query
-//   }, { abortEarly: false }); // agar semua error muncul sekaligus
+const validateJoi =
+    (schema, source = "body") =>
+    (req, res, next) => {
+        const { error, value } = schema.validate(req[source]);
 
-//   if (error) {
-//     // Jika ada error, kirim respon 400
-//     return res.status(400).json({
-//       success: false,
-//       message: "Validasi Joi Gagal",
-//       details: error.details
-//     });
-//   }
+        if (error) {
+            const cleanMessage = error.details[0].message.replace(/"/g, "");
+            return res.status(400).json({
+                success: false,
+                message: cleanMessage,
+            });
+        }
 
-//   // Jika sukses, timpa data dengan yang sudah bersih (value)
-//   req.body = value.body;
-//   next();
-// };
-
+        req[source] = value;
+        next();
+    };
 
 // ZOD
-  const validate = (schema) => (req, res, next) => {
+const validateZod = (schema) => (req, res, next) => {
     try {
-      const validatedData = schema.parse({
-        body: req.body,
-        params: req.params,
-        query: req.query,
-      });
+        const validatedData = schema.parse({
+            body: req.body,
+            params: req.params,
+            query: req.query,
+        });
 
-      req.body = validatedData.body || req.body;
-      req.params = validatedData.params || req.params;
-      req.query = validatedData.query || req.query;
+        req.body = validatedData.body || req.body;
+        req.params = validatedData.params || req.params;
+        req.query = validatedData.query || req.query;
 
-      next();
+        next();
     } catch (error) {
-      // Pastikan ini error dari Zod
-      if (error.issues) {
-        const errors = {};  
+        // Pastikan ini error dari Zod
+        if (error.issues) {
+            const errors = {};
 
-        error.issues.forEach((issue) => {
-          const location = issue.path[0]; // body / params / query
-          const field = issue.path[1];
+            error.issues.forEach((issue) => {
+                const location = issue.path[0]; // body / params / query
+                const field = issue.path[1];
 
-          if (!errors[location]) errors[location] = {};
-          errors[location][field] = issue.message;
-        });
+                if (!errors[location]) errors[location] = {};
+                errors[location][field] = issue.message;
+            });
 
-        return res.status(400).json({
-          success: false,
-          message: "Validasi gagal",
-          errors,
-        });
-      }
+            return res.status(400).json({
+                success: false,
+                message: "Validasi gagal",
+                errors,
+            });
+        }
 
-      next(error);
+        next(error);
     }
-  };
+};
 
-  module.exports = { validate };
+module.exports = { validateZod, validateJoi };

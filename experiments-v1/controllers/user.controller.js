@@ -1,6 +1,6 @@
 const {AppError} = require("../utils/appError");
 const {asyncHandlerv1} = require("../utils/asyncHandler");  
-const db = require("../config/db");
+const {db} = require("../config/db");
 
 const getUsers = asyncHandlerv1(async (req, res) => {
     const [rows] = await db.execute('SELECT * FROM  users');
