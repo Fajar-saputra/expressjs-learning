@@ -4,7 +4,20 @@ const { successRespon } = require("../utils/respon");
 const productService = require("../services/product.service");
 
 const getProducts = asyncHandlerv2(async (req, res) => {
-    const product = await productService.getAll();
+
+    const { page, limit, search, minPrice, maxPrice, category } = req.query;
+
+    const filters = {
+        page: 1,
+        limit: 10,
+        search,
+        minPrice: minPrice ? parseInt(minPrice) : undefined,
+        maxPrice: maxPrice ? parseInt(maxPrice) : undefined,
+        category,
+    };
+
+    const product = await productService.getAll(filters)
+
     successRespon(res, product, "Data product berhasil diambil");
 });
 

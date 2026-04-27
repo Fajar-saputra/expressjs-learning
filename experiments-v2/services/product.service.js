@@ -1,10 +1,10 @@
 const { AppError } = require("../utils/AppError");
 const productRepository = require("../repositories/product.repository");
 
-const getAll = async () => {
-    const products = await productRepository.findAll();
+const getAll = async (filters = {}) => {
+    const products = await productRepository.findAllWithFilters(filters);
 
-    if (products.length === 0) {
+    if (products.rows.length === 0) {
         throw new AppError("Data product kosong", 404);
     }
 

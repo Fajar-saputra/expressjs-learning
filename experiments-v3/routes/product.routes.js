@@ -3,10 +3,7 @@ const router = express.Router();
 const { validate } = require("../middlewares/validate.middleware");
 const { getProducts, createProducts, getProductByID, deleteProductByID, updateProduct } = require("../controllers/products.controller");
 const { schemaProduct, schemaParams } = require("../schema/schema");
-const { getProductAllPagination } = require("../controllers/products.service");
 
-// route spesifik
-router.get("/products/pagination", getProductAllPagination);
 
 // route umum
 router.get("/products", getProducts);
