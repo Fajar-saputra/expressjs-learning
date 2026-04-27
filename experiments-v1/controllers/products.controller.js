@@ -27,18 +27,17 @@ const updateProducts = asyncHandlerv1(async (req, res) => {
     const { productId } = req.params;
     const { name, price, description, category } = req.body;
 
-    await productService.updateProduct(name, price, description, category, productId);
+    const [product] = await productService.updateProduct(name, price, description, category, productId);
 
-    // successResponse(res, result[0], "Data products berhasil diperbarui");
-    successResponse(res, "Data products berhasil diperbarui");
+    successResponse(res, product[0], "Data products berhasil diperbarui");
 });
 
 const deleteProductById = asyncHandlerv1(async (req, res) => {
     const { productId } = req.params;
 
-    const deletedProduct = await productService.destroy(productId)
+    const deletedProduct = await productService.destroy(productId);
 
-    successResponse(res,deletedProduct, "Data products berhasil dihapus", 200);
+    successResponse(res, deletedProduct, "Data products berhasil dihapus", 200);
 });
 
 module.exports = { getProducts, getProductById, createProducts, updateProducts, deleteProductById };

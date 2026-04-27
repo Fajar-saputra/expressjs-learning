@@ -1,24 +1,23 @@
 const express = require("express");
 const app = express();
-const {errorHandler} = require('./middlewares/error.middleware')
-const {AppError} = require('./utils/AppError')
-const usersRoutes = require("./routes/users.routes")
-const authRoutes = require('./routes/auth.routes')
-const productRoutes = require('./routes/product.routes')
+const { errorHandler } = require("./middlewares/error.middleware");
+const { AppError } = require("./utils/AppError");
+const usersRoutes = require("./routes/users.routes");
+const authRoutes = require("./routes/auth.routes");
+const productRoutes = require("./routes/product.routes");
 
-app.use(express.json())
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => res.send("belajar lagi"));
-app.use("/api", usersRoutes)
-app.use("/api", authRoutes)
-app.use("/api", productRoutes)
-
+app.use("/api", usersRoutes);
+app.use("/api", authRoutes);
+app.use("/api", productRoutes);
 
 // Route 404 (Opsional: untuk menangani URL yang tidak terdaftar)
 app.use((req, res, next) => {
     throw new AppError("Halaman tidak ditemukan", 404);
 });
-
 
 // Middleware Error ditaruh PALING BAWAH
 app.use(errorHandler);
