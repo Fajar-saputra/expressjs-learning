@@ -6,8 +6,20 @@ const { successResponse, errorResponse } = require("../utils/response");
 const productService = require("../services/products.service");
 
 const getProducts = asyncHandlerv1(async (req, res) => {
-    const product = await productService.getAll();
-    successResponse(res, product, "Berhasil ambil data");
+    const { page = 1, limit = 10, search, minPrice, maxPrice, category } = req.query;
+
+    // Convert string to numbers where needed
+    const filters = {
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 10,
+        search,
+        minPrice: minPrice ? parseFloat(minPrice) : undefined,
+        maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
+        category,
+    };
+
+    const result = await productService.getAll(filters);
+    successResponse(res, result, "Berhasil ambil data");
 });
 
 const getProductById = asyncHandlerv1(async (req, res) => {
