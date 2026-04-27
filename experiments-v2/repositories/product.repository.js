@@ -7,11 +7,10 @@ const findAll = async () => {
 
 const findById = async (productId) => {
     const [rows] = await db.execute("SELECT * FROM products WHERE id = ?", [productId]);
-    return rows[0];
+    return rows.length > 0 ? rows[0] : null;
 };
 
 const create = async (name, price, category, description) => {
-    console.log(name, price, category, description);
     const [result] = await db.execute("INSERT INTO products (name, price, category, description) VALUES (?,?,?,?)", [name, price, category, description]);
     const [rows] = await db.execute("SELECT * FROM products WHERE id = ?", [result.insertId]);
     return rows[0];

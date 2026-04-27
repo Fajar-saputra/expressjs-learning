@@ -3,13 +3,16 @@ const productRepository = require("../repositories/products.repository");
 
 const getAll = async () => {
     const products = await productRepository.findAll();
+    if (products.length === 0) {
+        throw new AppError("Data product kosong", 404);
+    }
     return products;
 };
 
 const getById = async (productId) => {
     const product = await productRepository.findById(productId);
     if (!product) {
-        throw new Error("Product tidak ditemukan", 404);
+        throw new AppError("Product tidak ditemukan", 404);
     }
     return product;
 };
@@ -22,9 +25,15 @@ const createNewProduct = async (productData) => {
     return product;
 };
 
-const updateProduct = async (productData) => {
+const updateProduct = async (productData, productId) => {
     const { name, price, description, category } = productData;
-    
+
+    // Cek apakah product ada
+    const existingProduct = await productRepository.findById(productId);
+    if (!existingProduct) {
+        throw new AppError("Product tidak ditemukan", 404);
+    }
+
     const product = await productRepository.update(name, price, description, category, productId);
     return product;
 };
