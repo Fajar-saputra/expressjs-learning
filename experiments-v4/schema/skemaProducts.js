@@ -21,7 +21,9 @@ const schemaProduct = Joi.object({
             "number.base": "Harga harus berupa angka",
             "number.integer": "Harga tidak boleh desimal",
             "any.required": "Harga belum diisi"
-        })
+        }),
+    category: Joi.string().required(),
+    description: Joi.string().required()
 });
 
 module.exports = {schemaProduct}

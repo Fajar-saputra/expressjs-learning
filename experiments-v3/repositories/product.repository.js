@@ -19,7 +19,7 @@ const findAllWithFilters = async (filters) => {
         params.push(maxPrice);
     }
     if (category) {
-        baseConditions += " AND category = ?";
+        baseConditions += " AND category = ?"
         params.push(category);
     }
 

@@ -1,6 +1,4 @@
 const { db } = require("../config/db");
-const { asyncHandlerv1 } = require("../utils/asyncHandler");
-
 // format query sql kita Susu Fufufafa Wajib Ganti, Hari Order Libur
 // SELECT * FROM produk        -- (S)usu (F)ufufafa
 // WHERE 1 = 1                 -- (W)ajib (Mulai filter)
@@ -9,9 +7,9 @@ const { asyncHandlerv1 } = require("../utils/asyncHandler");
 // ORDER BY harga DESC         -- (H)ari (O)rder
 // LIMIT 10 OFFSET 0;          -- (L)ibur
 
-const getProductPagination = asyncHandlerv1(async (req, res) => {
+const findAllWithFilters = async (filters) => {
     // ambil data dari query
-    let { page = 1, limit = 10, search = "", category = "", sortBy = "id", order = "ASC" } = req.query;
+    let { page = 1, limit = 10, search = "", category = "", sortBy = "id", order = "ASC" } = filters;
 
     // konversi data
     page = parseInt(page);
@@ -68,8 +66,7 @@ const getProductPagination = asyncHandlerv1(async (req, res) => {
 
     // respon
 
-    res.status(200).json({
-        success: true,
+    return {
         pagination: {
             totalItem: total,
             currentPage: page,
@@ -77,7 +74,19 @@ const getProductPagination = asyncHandlerv1(async (req, res) => {
             itemPerPage: limit,
         },
         data: rows,
-    });
-});
+    };
+};
 
-module.exports = { getProductPagination };
+const findById = async (productId) => {
+    const [rows] = await db.execute("SELECT * FROM products WHERE id = ?", [productId]);
+    return rows[0];
+};
+
+const create = async (productData) => {
+    const { name, price, category, description } = productData;
+    const [result] = await db.execute("INSERT INTO products (name, price,category, description) VALUES (?,?,?,?)", [name, price, category, description]);
+
+    return findById(result.insertId);
+};
+
+module.exports = { findAllWithFilters, findById, create };
