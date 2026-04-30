@@ -84,9 +84,30 @@ const findById = async (productId) => {
 
 const create = async (productData) => {
     const { name, price, category, description } = productData;
-    const [result] = await db.execute("INSERT INTO products (name, price,category, description) VALUES (?,?,?,?)", [name, price, category, description]);
+    const [result] = await db.execute("INSERT INTO products (name, price,category ,description) VALUES (?,?,?,?)", [name, price, category, description]);
 
     return findById(result.insertId);
 };
 
-module.exports = { findAllWithFilters, findById, create };
+const update = async (productData, productId) => {
+    const { name, price, category, description } = productData;
+
+    const sql = `
+    UPDATE products
+    SET
+    name = COALESCE(?, name),
+    price = COALESCE(?, price),
+    category = COALESCE(?, category),
+    description = COALESCE(?, description)
+    WHERE id = ?
+    `;
+    await db.execute(sql, [name, price, category, description, productId]);
+
+    return findById(productId);
+};
+
+const destroy = async (productId) => {
+    return await db.execute("DELETE FROM products WHERE id = ?", [productId]);
+}
+
+module.exports = { findAll, findById, create, update, destroy };

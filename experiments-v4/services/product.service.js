@@ -14,9 +14,19 @@ const getProductById = async (productId) => {
     if (!product) throw new AppError("Product tidak ditemukan!", 404);
     return product;
 };
+const newProduct = async (productData) => {
+    return await productRepository.create(productData);
+};
 
-    const createNewProduct = async (productData) => {
-        return await productRepository.create(productData);
-    };
+const updateProduct = async (productData, productId) => {
+    const product = await productRepository.update(productData, productId);
 
-module.exports = { getProducts, getProductById, createNewProduct };
+    return getById(productId);
+};
+
+const deleteProduct = async (productId) => {
+    await getById(productId)
+    return await productRepository.destroy(productId)
+};
+
+module.exports = { getAll, getById, newProduct, updateProduct, deleteProduct };

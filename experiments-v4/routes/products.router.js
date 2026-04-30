@@ -1,23 +1,17 @@
 const express = require("express");
 const router = express();
-const {validate} = require("../middlewares/validate.middleware");
+const { validate } = require("../middlewares/validate.middleware");
 const { schemaProduct } = require("../schema/skemaProducts");
 
-const {
-    getProducts,
-    createProducts,
-    getProductById,
-    deleteProducts,
-    updateProducts
-} = require("../controllers/products.controller");
+const { getProducts, getProductById, createProduct, deleteProduct, updateProduct } = require("../controllers/products.controller");
 
 // route umum
 router.get("/products", getProducts);
-router.post("/products", validate(schemaProduct), createProducts);
+router.post("/products", validate(schemaProduct), createProduct);
 
 // route params
 router.get("/products/:productId", getProductById);
-router.delete("/products/:productId", deleteProducts);
-router.patch("/products/:productId", updateProducts);
+router.delete("/products/:productId", deleteProduct);
+router.patch("/products/:productId", updateProduct);
 
 module.exports = router;
