@@ -1,110 +1,17 @@
-const {asyncHandlerv2} = require("../utils/asyncHandler");
-const {AppError} = require("../utils/AppError");
-const {db} = require("../config/db");
-const bcrypt = require('bcryptjs');
-const jwt = require("jsonwebtoken");
-require('dotenv').config()
+    const {asyncHandlerv2} = require("../utils/asyncHandler");
+    require('dotenv').config()
 
-const register = asyncHandlerv2(async (req, res) => {
-    const { username, email, password } = req.body;
+    const authService = require('../services/auth.service');
+    const { successRespon } = require("../utils/respon");
 
-    // chcek user
-    const [existingUser] = await db.execute("SELECT email FROM users WHERE email =? ", [email]);
-
-    if (existingUser.length > 0) {
-        throw new appError("Email sudah terdaftar!", 400);
-    }
-
-    // salt & hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashPassword = await bcrypt.hash(password, salt);
-
-    // simpan ke database
-    const [result] = await db.execute("INSERT INTO users (username, email, password) VALUES (?,?,?)", [username, email, hashPassword]);
-
-    // respon
-    res.status(201).json({
-        success: true,
-        message: "Berhasil register!",
-        data: {
-            id: result.insertId,
-            username: username,
-        },
+    const register = asyncHandlerv2(async (req, res) => {
+        const user = await authService.register(req.body)
+        successRespon(res, user, "Berhasil register", 201)
     });
-});
 
-const login = asyncHandlerv2(async (req, res) => {
-    const { email, password } = req.body;
-
-    // check email
-    const [users] = await db.execute("SELECT * FROM users WHERE email = ?", [email]);
-
-    if (users.length === 0) {
-        // return res.status(200).json({
-        //     success: true,
-        //     message: `User dengan email ${email} belum terdaftar!`,
-        // });
-        throw new appError("Email atau Password salah", 401);  
-    }
-
-    const user = users[0];
-
-    // check password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-        throw new appError("Password salah!!", 400);
-    }
-
-    const token = jwt.sign(
-        {
-            id: user.id,
-            user: user.username
-        },
-        process.env.JWT_SECRET,
-        {
-            expiresIn: "1d"
-        });
-
-    res.status(200).json({
-        success: true,  
-        message: "berhasil login",
-        data: {
-            id: user.id,
-            username: user.username,
-            token,
-        },
+    const login = asyncHandlerv2(async (req, res) => {
+        const user = await authService.login(req.body)
+        successRespon(res, user, "Berhasil login", 200)
     });
-});
 
-const protect = asyncHandlerv2( async (req, res) => {
-    const authHeader = req.headers.authorization;
-    let token;
-
-    if (authHeader?.startWith('Bearer')) {
-        token = authHeader.split('')[1];
-    }
-
-    if (!token) {
-        throw new appError("Silahkan login untuk mengakses halaman ini!", 401)
-    }
-
-    try {
-        // verifikasi token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        // cek user masih ada di database
-        const [users] = await db.execute('SELECT id, username, email FROM users WHERE id = ?', [decoded.id])
-
-        if (users.length === 0) {
-            throw new appError("User pemilik token sudah tidak daftar", 401)
-        }
-
-        // simpan ke req.user agar bisa diakses controller berikutnya
-        req.user = users[0]
-        next();
-    } catch (error) {
-        throw new appError("Token tidak valid atau kadaluarwa", 401)
-    }
-
-})
-
-module.exports = { login, register };
+    module.exports = { login, register };
