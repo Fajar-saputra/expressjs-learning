@@ -6,9 +6,9 @@ const { usersSchema } = require("../validations/usersSchema");
 const { getUsers, createUsers, getUserById, deleteUser, updateUser } = require("../controllers/user.controller");
 
 router.get("/users", getUsers);
-router.get("/users/:id", getUserById);
+router.get("/users/:productId", getUserById);
 router.post("/users", validateZod(usersSchema), createUsers);
-router.patch("/users/:id", updateUser);
-router.delete("/users/:id", deleteUser);
+router.patch("/users/:productId", updateUser);
+router.delete("/users/:productId", deleteUser);
 
 module.exports = router;

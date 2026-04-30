@@ -3,7 +3,7 @@ const productRepository = require("../repositories/products.repository");
 
 const getAll = async (filters = {}) => {
     const result = await productRepository.findAllWithFilters(filters);
-    if (result.data.length === 0) {
+    if (result.rows.length === 0) {
         throw new AppError("Data product kosong", 404);
     }
     return result;

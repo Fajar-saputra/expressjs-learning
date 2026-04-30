@@ -1,10 +1,5 @@
 const { db } = require("../config/db");
 
-const findAll = async () => {
-    const [rows] = await db.execute("SELECT * FROM products");
-    return rows;
-};
-
 const findAllWithFilters = async (filters) => {
     const { page = 1, limit = 10, search, minPrice, maxPrice, category } = filters;
 
@@ -58,13 +53,13 @@ const findAllWithFilters = async (filters) => {
     const [rows] = await db.execute(query, params);
 
     return {
-        data: rows,
         pagination: {
             page: parseInt(page),
             limit: parseInt(limit),
             total,
             totalPages: Math.ceil(total / limit),
         },
+        rows,
     };
 };
 
@@ -100,4 +95,4 @@ const deleteProduct = async (productId) => {
     return result;
 };
 
-module.exports = { findAll, findAllWithFilters, findById, create, update, deleteProduct };
+module.exports = { findAllWithFilters, findById, create, update, deleteProduct };

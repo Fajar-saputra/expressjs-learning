@@ -6,8 +6,11 @@ const { errorHandler } = require("./middlewares/error.middleware");
 app.use(express.json());
 
 const produtsRoutes = require("./routes/products.routes");
+const authRoutes = require("./routes/auth.routes");
+
 // Routing
 app.use("/api", produtsRoutes);
+app.use("/api", authRoutes);
 
 app.use(errorHandler);
 

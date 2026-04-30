@@ -12,7 +12,7 @@ const getProducts = asyncHandlerv1(async (req, res) => {
 
 const getProductById = asyncHandlerv1(async (req, res) => {
     const product = productService.getById(req.params.productId);
-    successResponse(res, product, "Product berhasil ditemukan");
+    successResponse(res, product, "Product berhasil ditemukan");    
 });
 
 const createProduct = asyncHandlerv1(async (req, res) => {
