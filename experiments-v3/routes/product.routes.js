@@ -3,10 +3,10 @@ const router = express.Router();
 const { validate } = require("../middlewares/validate.middleware");
 const { getProducts, createProducts, getProductByID, deleteProductByID, updateProduct } = require("../controllers/products.controller");
 const { schemaProduct, schemaParams } = require("../schema/schema");
-
+const {protect} = require('../middlewares/auth.middleware')
 
 // route umum
-router.get("/products", getProducts);
+router.get("/products" ,protect, getProducts);
 router.post("/products", validate(schemaProduct, "body"), createProducts);
 
 // route dengnan parameter

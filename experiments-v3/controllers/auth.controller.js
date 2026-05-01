@@ -1,59 +1,16 @@
 const db = require("../config/db");
-const {AppError} = require("../utils/appError");
-const {asyncHandlerv1} = require("../utils/asyncHandler");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
+const authService = require("../services/auth.service");
+const { asyncHandlerv1 } = require("../utils/asyncHandler");
+const { successResponse } = require("../utils/response");
 
 const register = asyncHandlerv1(async (req, res) => {
-    const { username, email, password } = req.body;
-
-    if (!username || !email || !password) {
-        throw new AppError("Username, Email dan Password wajid diisi!!", 400);
-    }
-    if (username.length < 4 || email.length < 4 || password.length < 4) {
-        throw new AppError("Username, Email dan Password minimal 4 karakter!!", 400);
-    }
-
-    const hashPassword = await bcrypt.hash(password, 10);
-
-    await db.query("INSERT INTO users (username, email, password) VALUES (?,?,?)", [username, email, hashPassword]);
-
-    res.status(201).json({
-        success: true,
-        message: "Berhasil register",
-    });
+    const user = await authService.register(req.body);
+    successResponse(res, user, "Berhasil register", 201);
 });
 
 const login = asyncHandlerv1(async (req, res) => {
-    const { email, password } = req.body;
-
-    const [result] = await db.query("SELECT email FROM users WHERE email  = ?", [email]);
-
-    if (result[0].length === 0) {
-        throw new AppError("User tidak ditemukan!!");
-    }
-
-    const isTrue = await bcrypt.compare(password, result[0].password);
-
-    if (!isTrue) {
-        throw new AppError("Password salah! Ulangi!");
-    }
-
-    const token = jwt.sign(
-        {
-            id: result[0].id,
-        },
-        process.env.JWT_SECRET,
-        {
-            expiresIn: "1h",
-        },
-    );
-
-    res.status(200).json({
-        success: true,
-        message: "berhasil login",
-        token,
-    });
+    const user = await authService.login(req.body);
+    successResponse(res, user, "Berhasil login", 200);
 });
 
 module.exports = {

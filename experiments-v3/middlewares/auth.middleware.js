@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { AppErr } = require('../utils/appError');
+const { AppError } = require('../utils/appError');
 const {asyncHandlerv1} = require('../utils/asyncHandler')
 
 const protect = asyncHandlerv1(async (req, res, next) => {
@@ -9,7 +9,7 @@ const protect = asyncHandlerv1(async (req, res, next) => {
   }
 
   if (!token) {
-    return next(new AppErr('Kamu belum login! Silakan login untuk akses.', 401));
+    return next(new AppError('Kamu belum login! Silakan login untuk akses.', 401));
   }
 
   // Verifikasi token
@@ -18,7 +18,7 @@ const protect = asyncHandlerv1(async (req, res, next) => {
     req.user = decoded; // Simpan id user ke request agar bisa dipakai nanti
     next();
   } catch (err) {
-    return next(new AppErr('Token tidak valid atau kadaluwarsa', 401));
+    return next(new AppError('Token tidak valid atau kadaluwarsa', 401));
   }
 });
 
