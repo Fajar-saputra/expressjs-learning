@@ -5,7 +5,7 @@ const { successResponse, errorResponse } = require("../utils/response");
 const productService = require("../services/product.service");
 
 const getProducts = asyncHandlerv1(async (req, res) => {
-    const product = await productService.getAll(req.query);
+    const product = await productService.getProducts(req.query);
     successResponse(res, product, "Data Product berhasil diambil");
 });
 

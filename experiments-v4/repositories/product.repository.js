@@ -110,4 +110,4 @@ const destroy = async (productId) => {
     return await db.execute("DELETE FROM products WHERE id = ?", [productId]);
 }
 
-module.exports = { findAll, findById, create, update, destroy };
+module.exports = {findAllWithFilters, findById, create, update, destroy };

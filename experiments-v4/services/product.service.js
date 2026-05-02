@@ -29,4 +29,4 @@ const deleteProduct = async (productId) => {
     return await productRepository.destroy(productId)
 };
 
-module.exports = { getAll, getById, newProduct, updateProduct, deleteProduct };
+module.exports = { getProducts,getProductById, newProduct, updateProduct, deleteProduct };
