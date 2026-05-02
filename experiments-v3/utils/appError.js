@@ -7,7 +7,7 @@ class AppError extends Error {
         // Menentukan status berdasarkan statusCode (misal: 404 -> fail, 500 -> error)
         this.status = `${statusCode}`.startsWith("4") ? "fail" : "error";
 
-        // Menandai bahwa ini adalah error yang kita buat sendiri (bukan bug sistem/library)
+        // Menandai bahwa ini adalah erryuor yang kita buat sendiri (bukan bug sistem/library)
         this.isOperational = true;
 
         // Menghapus constructor AppError dari stack trace agar lebih bersih
@@ -15,11 +15,5 @@ class AppError extends Error {
     }
 }
 
-// class AppError extends Error {
-//     constructor(message, statusCode) {
-//         super(message);
-//         this.statusCode = statusCode;
-//     }
-// }
 
 module.exports = { AppError };
