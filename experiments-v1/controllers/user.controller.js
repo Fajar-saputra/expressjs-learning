@@ -1,103 +1,32 @@
-const {AppError} = require("../utils/appError");
-const {asyncHandlerv1} = require("../utils/asyncHandler");  
-const {db} = require("../config/db");
+const { AppError } = require("../utils/appError");
+const { asyncHandlerv1 } = require("../utils/asyncHandler");
+const { db } = require("../config/db");
+const userService = require("../services/user.service");
+const { successResponse } = require("../utils/response");
 
-const getUsers = asyncHandlerv1(async (req, res) => {
-    const [rows] = await db.execute('SELECT * FROM  users');
-
-    if (rows.length === 0) {
-        return res.status(200).json({
-            success: true,
-            message: "data masih kosong",
-            data: []
-        })
-    }
-
-    res.status(200).json({
-        success: true,
-        message: "berhasil mengambil data",
-        data: rows
-    })
-    
+const getUser = asyncHandlerv1(async (req, res) => {
+    const user = await userService.getUsers();
+    successResponse(res, user, "Berhasil ambil data user");
 });
 
 const getUserById = asyncHandlerv1(async (req, res) => {
-    const { id } = req.params;
-
-    const [rows] = await db.execute(
-        "SELECT id, username, email FROM users WHERE id = ?",
-        [id]
-    );
-
-    // Jika user tidak ditemukan
-    if (rows.length === 0) {
-        return res.status(404).json({
-            success: false,
-            message: `User dengan ID ${id} tidak ditemukan`
-        });
-    }
-
-    // Jika ditemukan
-    res.status(200).json({
-        success: true,
-        message: `Berhasil ambil user dengan ID ${id}`,
-        data: rows[0]
-    });
+    const user = await userService.getUser(req.params.userId);
+    successResponse(res, user, `User ID ${req.params.userId} ada`);
 });
 
-const createUsers = asyncHandlerv1( async (req, res) => {
-    const { username, email, password } = req.body;
-
-    const [result] = await db.execute("INSERT INTO users (username, email, password) VALUES (?,?,?)", [username, email, password])
-
-    res.status(201).json({
-        success: true,
-        message: "berhasil menambahkan user baru",
-        data: {
-            id: result.insertId,
-            username: username,
-            email: email
-        }
-    })
-})
-
-const updateUser = asyncHandlerv1(async (req, res) => {
-    const { id } = req.params;
-    const { username, email, password } = req.body;
-
-
-    const [rows] = await db.execute("SELECT id FROM users WHERE id = ?", [id])
-
-    if (rows.length === 0) {
-        throw new AppError("User tidak ditemukan", 404)
-    }
-
-    const [result] = await db.execute("UPDATE users SET username = COALESCE(?, username), email = COALESCE(?, email), password = COALESCE(?, password) WHERE id = ?", [username || null, email || null, password|| null, id || null])
-
-    res.status(200).json({
-        success: true,
-        message: `berhasil update user ID ${id}`,
-        data: {
-            changed: result.changedRows > 0
-        }
-    })
-
-
-})
+const createUsers = asyncHandlerv1(async (req, res) => {
+    const user = await userService.createUser(req.body);
+    successResponse(res, user, "Berhasil ambil data user", 201);
+});
 
 const deleteUser = asyncHandlerv1(async (req, res) => {
-    const { id } = req.params;
+    const user = await userService.deleteUser(req.params.userId);
+    successResponse(res, user, "User berhasil dihapus")
+});
 
-    const [result] = await db.execute("DELETE FROM users WHERE id = ?", [id])
+const updateUser = asyncHandlerv1(async (req, res) => {
+    const user = await userService.updateUser(req.body, req.params.userId);
+    successResponse(res, user, "Berhasil ambil data user")
+});
 
-    if (result.affectedRows === 0) {
-        throw new AppError("User tidak ditemukan!", 404)
-    }
-
-    res.status(200).json({
-        success: true,
-        message: `Berhasil hapus user ID ${id}`,
-    })
-})
-
-module.exports = {getUsers, createUsers, getUserById, deleteUser, updateUser}
+module.exports = { getUser,getUserById, createUsers, getUserById, deleteUser, updateUser };

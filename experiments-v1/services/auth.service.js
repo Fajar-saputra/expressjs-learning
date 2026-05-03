@@ -1,23 +1,23 @@
-const authRepository = require("../repositories/auth.repository");
+const userRepository = require("../repositories/user.repository");
 const { AppError } = require("../utils/appError");
 const { db } = require("../config/db");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
 const register = async ({username, email, passowrd}) => {
-    const user = authRepository.findByEmail(email);
+    const user = userRepository.findByEmail(email);
 
     if (user) throw new AppError("Email sudah terdaftar!", 400);
 
     const hashPassword = bcrypt.hash(passowrd, 10);
 
-    await authRepository.create(username, email, hashPassword);
+    await userRepository.create(username, email, hashPassword);
 
     return { username, email };
 };
 
 const login = async ({email, passowrd}) => {
-    const user = await authRepository.findByEmail(email);
+    const user = await userRepository.findByEmail(email);
 
     if (!user) throw new AppError("Email tidak ditemukan", 404);
 
