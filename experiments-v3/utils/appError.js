@@ -1,4 +1,3 @@
-// versi pro dikit
 class AppError extends Error {
     constructor(message, statusCode) {
         super(message);
