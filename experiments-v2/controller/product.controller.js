@@ -1,10 +1,9 @@
 const { asyncHandlerv2 } = require("../utils/asyncHandler");
-const { successRespon } = require("../utils/respon");
+const { successRespon } = require("../utils/response");
 
 const productService = require("../services/product.service");
 
 const getProducts = asyncHandlerv2(async (req, res) => {
-
     const { page, limit, search, minPrice, maxPrice, category } = req.query;
 
     const filters = {
@@ -16,7 +15,7 @@ const getProducts = asyncHandlerv2(async (req, res) => {
         category,
     };
 
-    const product = await productService.getAll(filters)
+    const product = await productService.getAll(filters);
 
     successRespon(res, product, "Data product berhasil diambil");
 });

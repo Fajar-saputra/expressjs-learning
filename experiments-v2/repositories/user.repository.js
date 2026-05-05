@@ -10,4 +10,12 @@ const create = async (username, email, password) => {
     return result;
 }
 
-module.exports = {findByEmail, create}
+const findById = async (userId)=> {
+    const [rows] = await db.execute(
+        "SELECT id, username, email, role FROM users WHERE id = ?",
+        [userId]
+    );
+    return rows[0] || null;
+};
+
+module.exports = { findByEmail, create, findById };
