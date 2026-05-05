@@ -10,7 +10,7 @@ const findByEmail = async (email) => {
 };
 
 const findById = async (userId) => {
-    const [user] = await db.execute("SELECT * FROM users WHERE id = ?", [userId]);
+    const [user] = await db.execute("SELECT id, username, email FROM users WHERE id = ?", [userId]);
     return user[0] || null;
 };
 
@@ -33,5 +33,7 @@ const destroy = async (userId) => {
     const [result] = await db.execute("DELETE FROM users WHERE id = ?", [userId]);
     return result;
 };
+
+
 
 module.exports = { findByEmail, findById, findAll, create, update, destroy };

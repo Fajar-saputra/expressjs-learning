@@ -37,4 +37,15 @@ const login = async ({email, passowrd}) => {
     return token;
 };
 
-module.exports = {login, register}
+
+const getMe = async (userId) => {
+    const user = await userRepository.findById(userId)
+    if (!user) {
+        throw new AppError("User tidak ditemukan", 404);
+    }
+
+    return user;
+    
+}
+
+module.exports = {login, register, getMe}

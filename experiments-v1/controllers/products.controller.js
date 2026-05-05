@@ -29,8 +29,23 @@ const getProductById = asyncHandlerv1(async (req, res) => {
 });
 
 const createProducts = asyncHandlerv1(async (req, res) => {
-    const product = await productService.createNewProduct(req.body);
-    successResponse(res, product, "Data products berhasil dibuat", 201);
+    const { name, price, description, category } = req.body;
+
+    let imagePath = null;
+
+    if (req.file) {
+        imagePath = `/uploads/${req.file.filename}`;
+    }
+
+    const data = await productService.createNewProduct({
+        name,
+        price,
+        description,
+        category,
+        image: imagePath
+    });
+
+    successResponse(res, data, "Product berhasil dibuat", 201);
 });
 
 const updateProducts = asyncHandlerv1(async (req, res) => {

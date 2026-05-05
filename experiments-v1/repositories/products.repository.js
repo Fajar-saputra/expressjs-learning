@@ -68,12 +68,17 @@ const findById = async (productId) => {
     return rows.length > 0 ? rows[0] : null;
 };
 
-const create = async (name, price, description, category) => {
-    const [result] = await db.execute("INSERT INTO products (name, price, description, category) VALUES (?, ?, ?, ?)", [name, price, description, category]);
+const create = async (name, price, description, category, image) => {
+    const [result] = await db.execute("INSERT INTO products (name, price, description, category, image) VALUES (?, ?, ?, ?, ?)", [name, price, description, category, image]);
 
-    const [rows] = await db.execute("SELECT * FROM products WHERE id = ?", [result.insertId]);
-
-    return rows[0];
+    return {
+        id: result.insertId,
+        name,
+        price,
+        description,
+        category,
+        image,
+    };
 };
 
 const update = async (name, price, description, category, productId) => {

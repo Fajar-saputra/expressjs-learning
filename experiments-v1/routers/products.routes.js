@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const { validateJoi } = require('../middlewares/validate.middleware');
+const upload = require('../middlewares/upload');
 const { productsSchema, paramsSchema } = require('../validations/productsSchema');
 const {
     getProducts,
@@ -13,7 +14,7 @@ const {
 
 // route umum
 router.get('/products', getProducts)
-router.post('/products', validateJoi(productsSchema, 'body'), createProducts)
+router.post('/products', upload.single('image'), validateJoi(productsSchema, 'body'), createProducts)
 
 // route params
 router.get('/products/:productId',validateJoi(paramsSchema, 'params')  ,getProductById)

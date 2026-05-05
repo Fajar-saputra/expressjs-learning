@@ -17,10 +17,8 @@ const getById = async (productId) => {
     return product;
 };
 
-const createNewProduct = async (productData) => {
-    const { name, price, description, category } = productData;
-
-    const product = await productRepository.create(name, price, description, category);
+const createNewProduct = async ({ name, price, description, category, image }) => {
+    const product = await productRepository.create(name, price, description, category, image);
 
     return product;
 };

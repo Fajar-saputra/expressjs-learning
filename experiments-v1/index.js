@@ -7,6 +7,7 @@ const productsRoutes = require('./routers/products.routes')
 const { errorHandler } = require("./middlewares/error.middleware")
  
 app.use(express.json())
+app.use("/uploads", express.static("uploads"));
 
 app.get('/', (req, res) => {
   res.send('Server Backend Berhasil Jalan!');
