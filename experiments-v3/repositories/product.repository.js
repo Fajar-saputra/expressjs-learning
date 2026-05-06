@@ -45,11 +45,10 @@ const findById = async (id) => {
     return rows[0];
 };
 
-const create = async (data) => {
-    const { name, price, category, description } = data;
+const create = async ({name, price, category, description, image}) => {
     const [result] = await db.execute(
-        "INSERT INTO products (name, price, category, description) VALUES (?, ?, ?, ?)",
-        [name, price, category, description]
+        "INSERT INTO products (name, price, category, description, image) VALUES (?, ?, ?, ?, ?)",
+        [name, price, category, description, image]
     );
     return findById(result.insertId);
 };

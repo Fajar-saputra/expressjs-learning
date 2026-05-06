@@ -1,10 +1,10 @@
 const  jwt  = require("jsonwebtoken");
-const authRepository = require("../repositories/auth.repository");
+const userRepository = require("../repositories/user.repository");
 const { AppError } = require("../utils/appError");
 const bcrypt = require('bcryptjs')
 
 const login = async ({ email, password }) => {
-    const user = await authRepository.findByEmail(email);
+    const user = await userRepository.findByEmail(email);
     if (!user) throw new AppError("Email tidak ditemukan!", 404);
 
     const isTrue = await bcrypt.compare(password, user.password);
@@ -26,12 +26,12 @@ const login = async ({ email, password }) => {
 };
 
 const register = async ({ username, email, password }) => {
-    const user = await authRepository.findByEmail(email);
+    const user = await userRepository.findByEmail(email);
     if (user) throw new AppError("Email sudah terdaftar", 400);
 
     const hashPassword = await bcrypt.hash(password, 10);
 
-    await authRepository.create(username, email, hashPassword)
+    await userRepository.create(username, email, hashPassword)
 
     return { username, email };
 };

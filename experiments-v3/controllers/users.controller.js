@@ -17,8 +17,14 @@ const getUser = asyncHandlerv2(async (req, res) => {
 
 // 3. Membuat User Baru (Bisa untuk Register atau Admin Create)
 const createUser = asyncHandlerv2(async (req, res) => {
-    // req.body berisi { username, email, password }
-    const newUser = await userService.createUser(req.body);
+    const { username, email, password, image } = req.body;
+    let imagePath = null;
+
+    if (req.file) {
+        imagePath = `/uploads/${req.file.filenames}`
+    }
+
+    const newUser = await userService.createUser(username, email, password, imagePath);
     successResponse(res, newUser, "User berhasil dibuat", 201);
 });
 

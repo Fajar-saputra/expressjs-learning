@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const { AppError } = require('../utils/appError');
 const {asyncHandlerv1} = require('../utils/asyncHandler')
 
-const protect = asyncHandlerv1(async (req, res, next) => {
+const protect = (req, res, next) => {
   let token;
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
@@ -14,12 +14,13 @@ const protect = asyncHandlerv1(async (req, res, next) => {
 
   // Verifikasi token
   try {
-    const decoded = await jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Simpan id user ke request agar bisa dipakai nanti
+    const decoded =  jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; 
     next();
   } catch (err) {
     return next(new AppError('Token tidak valid atau kadaluwarsa', 401));
   }
-});
+  
+};
 
 module.exports = { protect };

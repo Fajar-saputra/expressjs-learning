@@ -14,9 +14,9 @@ const getUsers = async () => {
     return userRepository.getAll();
 };
 
-const createUser = async ({ username, email, password }) => {
+const createUser = async ( username, email, password,  image) => {
     const hashPassword = await bcrypt.hash(password, 10);
-    const user = await userRepository.create(username, email, hashPassword);
+    const user = await userRepository.create(username, email, hashPassword, image);
     return user;
 };
 

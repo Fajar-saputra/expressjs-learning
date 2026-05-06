@@ -1,8 +1,8 @@
 const productService = require("../services/product.service");
-const { asyncHandlerv1 } = require("../utils/asyncHandler");
+const { asyncHandlerv2 } = require("../utils/asyncHandler");
 const { successResponse } = require("../utils/response");
 
-const getProducts = asyncHandlerv1(async (req, res) => {
+const getProducts = asyncHandlerv2(async (req, res) => {
     const filters = {
         page: parseInt(req.query.page) || 1,
         limit: parseInt(req.query.limit) || 10,
@@ -16,22 +16,29 @@ const getProducts = asyncHandlerv1(async (req, res) => {
     successResponse(res, data, "Berhasil mengambil data produk");
 });
 
-const getProductByID = asyncHandlerv1(async (req, res) => {
+const getProductByID = asyncHandlerv2(async (req, res) => {
     const product = await productService.getById(req.params.productId);
     successResponse(res, product, "Berhasil mengambil detail produk");
 });
 
-const createProducts = asyncHandlerv1(async (req, res) => {
-    const product = await productService.createNewProducts(req.body);
+const createProducts = asyncHandlerv2(async (req, res) => {
+    const { name, price, category, description } = req.body;
+    let imagePath = null;
+
+    if (req.file) {
+        imagePath = `/uploads/${req.file.filename}`;
+    }
+
+    const product = await productService.createNewProducts({ name, price, category, description, image: imagePath });
     successResponse(res, product, "Produk berhasil ditambahkan", 201);
 });
 
-const updateProduct = asyncHandlerv1(async (req, res) => {
+const updateProduct = asyncHandlerv2(async (req, res) => {
     const product = await productService.updateProduct(req.params.productId, req.body);
     successResponse(res, product, "Produk berhasil diperbarui");
 });
 
-const deleteProductByID = asyncHandlerv1(async (req, res) => {
+const deleteProductByID = asyncHandlerv2(async (req, res) => {
     await productService.deleteProduct(req.params.productId);
     successResponse(res, null, "Produk berhasil dihapus");
 });
