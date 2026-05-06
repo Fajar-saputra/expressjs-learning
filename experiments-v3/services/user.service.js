@@ -45,4 +45,8 @@ const deleteUser = async (userId) => {
     return null;
 };
 
-module.exports = { getUser, getUsers, createUser, updateUser, deleteUser };
+const getMe = async (id) => {
+   return userRepository.findById(id)
+}
+
+module.exports = { getUser, getUsers, createUser, updateUser, deleteUser, getMe };

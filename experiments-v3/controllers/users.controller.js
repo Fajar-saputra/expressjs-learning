@@ -43,10 +43,16 @@ const deleteUser = asyncHandlerv2(async (req, res) => {
     successResponse(res, null, "User berhasil dihapus");
 });
 
+const getMeByUser = asyncHandlerv2(async (req, res) => {
+    const me = await userService.getMe(req.user.id)
+    successResponse(res, me, "Berhasil ambil data me")
+})
+
 module.exports = { 
     getUsers, 
     getUser, 
     createUser, 
     updateUserByAdmin, 
-    deleteUser 
+    deleteUser,
+    getMeByUser
 };
