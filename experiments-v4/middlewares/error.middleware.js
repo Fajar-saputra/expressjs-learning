@@ -9,11 +9,16 @@
  * @param {import('express').NextFunction} next - Fungsi Next Express.
  */
 
-const cleanStack = err.stack.split("\n").map((m) => m.trim());
-
 const errorHandler = (err, req, res, next) => {
+    const cleanStack = err.stack.split("\n").map((m) => m.trim());
     const statusCode = err.statusCode || 500;
     const message = err.message || "Internal Server Error";
+
+    console.log("=============================================");
+    console.log("Message     : ", message);
+    console.log("statusCode  : ", statusCode);
+    console.log("cleanStack  : ", cleanStack);
+    console.log("=============================================");
 
     res.status(statusCode).json({
         success: "error",
