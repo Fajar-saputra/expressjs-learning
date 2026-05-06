@@ -1,9 +1,9 @@
 const express = require('express');
 const { getUser, getUsers, createUser, updateUserByAdmin, deleteUser, getMeByUser } = require('../controllers/users.controller');
-const { protect } = require('../services/auth.service');
+const { protect, authorize } = require('../services/auth.service');
 const router = express.Router();
 
-router.get('/me',protect,  getMeByUser)
+router.get('/me',protect, authorize('user') ,getMeByUser)
 router.get('/users', getUser)
 router.get('/users/userId', getUsers)
 router.post('/users', createUser)
