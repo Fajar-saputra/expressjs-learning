@@ -1,6 +1,6 @@
-const userService = require('../services/user.service');
-const { asyncHandler } = require('../utils/asyncHandler'); 
-const { successResponse } = require('../utils/responseHelper'); 
+const userService = require("../services/user.service");
+const { asyncHandler } = require("../utils/asyncHandler");
+const { successResponse } = require("../utils/responseHelper");
 
 const getAllUsers = asyncHandler(async (req, res) => {
     const users = await userService.getAllUser();
@@ -16,7 +16,7 @@ const createUser = asyncHandler(async (req, res) => {
     const imagePath = req.file ? req.file.path : null;
     const userData = {
         ...req.body,
-        image: imagePath
+        image: imagePath,
     };
 
     const newUser = await userService.createUser(userData);
@@ -29,7 +29,7 @@ const updateUser = asyncHandler(async (req, res) => {
 
     const updateData = {
         ...req.body,
-        ...(imagePath && { image: imagePath })
+        ...(imagePath && { image: imagePath }),
     };
 
     await userService.updateUser(userId, updateData);
@@ -47,5 +47,5 @@ module.exports = {
     getUserById,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
 };

@@ -1,7 +1,7 @@
 const { db } = require("../config/db");
 
 const findAll = async (reqQuery) => {
-    let { page, limit } = reqQuery;
+    let { page = 1, limit = 10 } = reqQuery;
     const offset = (page - 1) * limit;
 
     let sql = `SELECT * FROM products LIMIT ? OFFSET ?`;
