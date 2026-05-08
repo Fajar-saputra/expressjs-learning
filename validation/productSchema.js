@@ -1,21 +1,25 @@
-const { z } = require("zod");
+const Joi = require("joi");
 
-const productSchema = z.object({
-    body: z.object({
-        name: z.string().min(4, "Minimal 4 karakter").max(100, "Maksimal 100 karakter"),
-
-        category: z.string().min(2, "Minimal 2 karakter").max(50, "Maksimal 50 karakter"),
-
-        description: z.string().min(4, "Minimal 4 karakter").max(255, "Maksimal 255 karakter").optional().or(z.literal("")),
-
-        price: z
-            .number({
-                required_error: "Price wajib diisi",
-                invalid_type_error: "Price harus berupa angka",
-            })
-            .positive("Price harus lebih dari 0")
-            .int(),
+const productSchema = Joi.object({
+    name: Joi.string().min(4).max(100).required().messages({
+        "string.min": "Minimal 4 karakter",
+        "any.required": "Name wajib diisi",
     }),
+
+    category: Joi.string().min(2).max(50).required().messages({
+        "string.min": "Minimal 2 karakter",
+        "any.required": "Category wajib diisi",
+    }),
+
+    description: Joi.string().min(4).max(255).allow("", null),
+
+    price: Joi.number().integer().positive().required().messages({
+        "number.base": "Price harus berupa angka",
+        "any.required": "Price wajib diisi",
+    }),
+
+    // Tetap pisahkan atau masukkan field image di sini jika ingin divalidasi bersama
+    image: Joi.any().optional(),
 });
 
 module.exports = { productSchema };

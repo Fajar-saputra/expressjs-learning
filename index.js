@@ -5,9 +5,11 @@ const { AppError } = require("./utils/AppError");
 const usersRoutes = require("./routes/users.routes");
 const authRoutes = require("./routes/auth.routes");
 const productRoutes = require("./routes/product.routes");
+const path = require('path')
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.get("/", (req, res) => res.send("belajar lagi"));
 app.use("/api", usersRoutes);

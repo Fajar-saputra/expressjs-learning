@@ -1,3 +1,6 @@
+// const fs = require("fs").promises;
+const fs = require("fs");
+const path = require("path");
 const { AppError } = require("../utils/AppError");
 const productRepository = require("../repositories/product.repository");
 
@@ -20,25 +23,29 @@ const getById = async (productId) => {
     return product;
 };
 
-const newCreateProduct = async (productData) => {
-    console.log(productData);
-    const { name, price, category, description } = productData;
-
-    const product = await productRepository.create(name, price, category, description);
-
-    return product;
+const newCreateProduct = async ({ name, price, category, description, image }) => {
+    return await productRepository.create({ name, price, category, description, image });
 };
 
-const updateProduct = async (productData, productId) => {
-    const { name, price, category, description } = productData;
-
-    const product = await productRepository.update(name, price, category, description, productId);
+const updateProduct = async (productId, { name, price, category, description, image }) => {
+    const product = await productRepository.findById(productId);
 
     if (!product) {
         throw new AppError("product tidak ditemukan", 404);
     }
 
-    return product;
+    if (image && product.image) {
+        const filename = product.image.replace("/uploads/", "");
+        const oldPath = path.join(__dirname, "..", filename);
+
+        if (fs.existsSync(oldPath)) {
+            fs.unlinkSync(oldPath);
+        }
+    }
+
+    const update = await productRepository.update(productId, { name, price, category, description, image });
+
+    return update;
 };
 
 const destroy = async (productId) => {
