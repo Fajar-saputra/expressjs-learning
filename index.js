@@ -4,6 +4,8 @@ require("dotenv").config();
 const { errorHandler } = require("./middlewares/error.middleware");
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use("/uploads", express.static("uploads"));
 
 const produtsRoutes = require("./routes/products.routes");
 const authRoutes = require("./routes/auth.routes");

@@ -11,12 +11,16 @@ const getProducts = asyncHandlerv1(async (req, res) => {
 });
 
 const getProductById = asyncHandlerv1(async (req, res) => {
-    const product = productService.getById(req.params.productId);
-    successResponse(res, product, "Product berhasil ditemukan");    
+    const product = await productService.getById(req.params.productId);
+    successResponse(res, product, "Product berhasil ditemukan");
 });
 
 const createProduct = asyncHandlerv1(async (req, res) => {
-    const product =await productService.newProduct(req.body);
+    const { name, price, category, description, image } = req.body;
+
+    let imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+
+    const product = await productService.newProduct({ name, price, category, description, image: imagePath });
     successResponse(res, product, "Product berhasil dibuat", 201);
 });
 
@@ -26,7 +30,12 @@ const deleteProduct = asyncHandlerv1(async (req, res) => {
 });
 
 const updateProduct = asyncHandlerv1(async (req, res) => {
-    const product = await productService.updateProduct(req.body, req.params.productId);
+    const { name, price, category, description, image } = req.body;
+
+    let imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+
+    const product = await productService.updateProduct(req.params.productId, { name, price, category, description, image: imagePath });
+
     successResponse(res, product, "Product berhasil diupdate", 200);
 });
 
