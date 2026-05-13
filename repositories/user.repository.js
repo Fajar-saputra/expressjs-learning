@@ -35,4 +35,20 @@ const destroy = async (userId) => {
     return rows;
 };
 
-module.exports = { getAll, findByEmail, findById, create, destroy, update };
+const updatePassword = async (id, password) => {
+    await db.query(
+        "UPDATE users SET password = ? WHERE id = ?",
+        [password, id]
+    );
+};
+
+const findByIdWithPassword = async (id) => {
+    const [rows] = await db.query(
+        "SELECT * FROM users WHERE id = ?",
+        [id]
+    );
+
+    return rows[0];
+};
+
+module.exports = { getAll, findByEmail, findById, create, destroy, update, findByIdWithPassword, updatePassword };

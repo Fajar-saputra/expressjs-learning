@@ -68,4 +68,32 @@ const authorize = (...roles) => (req, res, next) =>  {
     next();
 }
 
-module.exports ={ register, login, protect, authorize}
+const updatePassword = async (userId, body) => {
+    const { currentPassword, newPassword } = body;
+
+    const user = await userRepository.findByIdWithPassword(userId);
+
+    if (!user) {
+        throw new AppError("User tidak ditemukan", 404);
+    }
+
+    const isMatch = await bcrypt.compare(
+        currentPassword,
+        user.password
+    );
+
+    if (!isMatch) {
+        throw new AppError("Password lama salah", 400);
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await userRepository.updatePassword(
+        userId,
+        hashedPassword
+    );
+
+    return null;
+};
+
+module.exports ={ register, login, protect, authorize, updatePassword}

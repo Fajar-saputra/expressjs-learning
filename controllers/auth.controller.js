@@ -13,6 +13,15 @@ const login = asyncHandlerv2(async (req, res) => {
     successResponse(res, user, "Berhasil login", 200);
 });
 
+const updatePassword = asyncHandler(async (req, res) => {
+    const data = await authService.updatePassword(
+        req.user.id,
+        req.body
+    );
+
+    successResponse(res, data, "Password berhasil diupdate");
+});
+
 module.exports = {
     register,
     login,
