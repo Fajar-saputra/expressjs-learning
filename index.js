@@ -1,22 +1,13 @@
-const express = require("express");
-const app = express();
-require("dotenv").config();
-const { errorHandler } = require("./middlewares/error.middleware");
+const express = require('express')
+require('dotenv').config();
+const app = express()
+const port = process.env.PORT
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use("/uploads", express.static("uploads"));
 
-const produtsRoutes = require("./routes/products.routes");
-const authRoutes = require("./routes/auth.routes");
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
 
-// Routing
-app.use("/api", produtsRoutes);
-app.use("/api", authRoutes);
-
-app.use(errorHandler);
-
-// Start server
-app.listen(process.env.PORT, () => {
-    console.log("Server running on port 5000");
-});
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
