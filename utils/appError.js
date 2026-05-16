@@ -4,3 +4,5 @@ class appError extends Error {
         this.statusCode = statusCode;
     }
 }
+
+module.exports = {appError}
