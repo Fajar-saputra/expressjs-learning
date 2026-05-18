@@ -1,5 +1,6 @@
 const userRepository = require("../repositories/user.repository");
-const bcrypt = require('bcrypt')
+const bcrypt = require("bcrypt");
+const { appError } = require("../utils/appError");
 
 const getByAll = async () => {
     return userRepository.findAll();
@@ -17,9 +18,9 @@ const createUserByAdmin = async ({ username, email, password, role }) => {
     const user = await userRepository.findByEmail(email);
     if (user) throw new appError("User sudah register!", 400);
 
-    const hashpassword =await bcrypt.hash(password, 10);
+    const hashpassword = await bcrypt.hash(password, 10);
 
-    await userRepository.create({ username, email, password:hashpassword, role });
+    await userRepository.create({ username, email, password: hashpassword, role });
 
     return { username, email, role };
 };
