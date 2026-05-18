@@ -3,9 +3,7 @@ class appError extends Error {
         super(message);
         this.statusCode = statusCode;
         this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
-        this.isOperational = true; // Menandakan bahwa ini adalah error yang kita buat sengaja (prediktabil)
-
-        // Menyembunyikan fungsi constructor ini dari stack trace agar log lebih bersih
+        this.isOperational = true;
         Error.captureStackTrace(this, this.constructor);
     }
 }

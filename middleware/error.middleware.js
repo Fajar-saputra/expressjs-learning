@@ -3,7 +3,7 @@ const errorHandler = (err, req, res, next) => {
     let statusCode = err.statusCode || 500;
     let message = err.message || "Internal Server Error";
 
-    // 2. Handling error spesifik dari library JWT (Opsional tapi sangat berguna)
+    // 2. Handling error spesifik dari library JWT
     if (err.name === "JsonWebTokenError") {
         statusCode = 401;
         message = "Token tidak valid, silakan login ulang.";
