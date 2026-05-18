@@ -10,9 +10,9 @@ const getById = async (productId) => {
     return productRepository.findById(productId);
 };
 
-const createProduct = async (productId, { name, category, description, price, image }) => {
-    const product = await productRepository.findById(productId);
-    if (product) throw new appError("Product sudah ada!", 400);
+const createProduct = async ({ name, category, description, price, image }) => {
+    const productExists = await productRepository.findByName(name); 
+    if (productExists) throw new appError("Product sudah ada!", 400);
 
     await productRepository.create({ name, category, description, price, image });
 

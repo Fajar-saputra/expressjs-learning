@@ -1,5 +1,5 @@
 const mysql = require("mysql2/promise");
-// require('dotenv').config()
+require("dotenv").config();
 
 const db = mysql.createPool({
     host: process.env.DB_HOST,
@@ -10,14 +10,16 @@ const db = mysql.createPool({
     connectionLimit: 10,
 });
 
-db.getConnection()
-    .then((conn) => {
-        console.log("Database terhubung!");
-        conn.release();
-        return;
-    })
-    .catch((err) => {
-        console.log("Database gagal terhubung!");
-    });
+if (process.env.NODE_ENV !== "test") {
+    db.getConnection()
+        .then((conn) => {
+            console.log("Database terhubung!");
+            conn.release();
+            return;
+        })
+        .catch((err) => {
+            console.log("Database gagal terhubung!");
+        });
+}
 
 module.exports = db;

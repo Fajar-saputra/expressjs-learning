@@ -1,24 +1,33 @@
-const prodcutService = require("../services/product.service");
+const productService = require("../services/product.service");
 const { asyncHandler } = require("../utils/asyncHandler");
 const { successResponse } = require("../utils/successResponse");
 
 const createProduct = asyncHandler(async (req, res) => {
     const { name, category, description, price } = req.body;
-    let imagePath = null;
-    if (req.file) {
-         imagePath = `/uploads${req.file.filename}`;
+
+    if (!req.file) {
+        throw new appError("Gambar produk belum dipilih", 400);
     }
 
-    const product = await prodcutService.createProduct({ name, category, description, price, image = imagePath });
-    successResponse(res, product, "Berhasil create prodcut baru", 201);
+    const imagePath = `/uploads/${req.file.filename}`;
+
+    const product = await productService.createProduct({
+        name,
+        category,
+        description,
+        price,
+        image: imagePath,
+    });
+
+    successResponse(res, product, "Berhasil create product baru", 201);
 });
 
 const productById = asyncHandler(async (req, res) => {
-    const product = await prodcutService.getById(req.params.productId);
+    const product = await productService.getById(req.params.productId);
     successResponse(res, product, `Berhasil user ID ${product.id}`);
 });
 const prodcutAll = asyncHandler(async (req, res) => {
-    const product = await prodcutService.getByAll();
+    const product = await productService.getByAll();
     successResponse(res, product, `Berhasil ambil semua user`);
 });
 
