@@ -21,6 +21,7 @@
     "homepage": "https://github.com/Fajar-saputra/expressjs-learning#readme",
     "dependencies": {
         "bcrypt": "^6.0.0",
+        "crypto-js": "^4.2.0",
         "dotenv": "^17.4.2",
         "express": "^5.2.1",
         "jsonwebtoken": "^9.0.3",
