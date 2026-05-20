@@ -14,24 +14,24 @@ const registerUser = asyncHandler(async (req, res) => {
     successResponse(res, user, "Berhasil register", 201);
 });
 
+const updatePassword = asyncHandler(async (req, res) => {
+    const { newPassword, currentPassword } = req.body;
+    const data = await authService.updatePassword(req.user.id, { newPassword, currentPassword });
+    successResponse(res, data, "Berhasil update password");
+});
+
 const resetPassoword = asyncHandler(async (req, res) => {
     const { token } = req.params;
-    await authService.resetPassoword(token, req.body.password);
+
+    await authService.resetPassword(token, req.body.password);
 
     successResponse(res, null, "Password berhasil direset");
 });
 
-const updatePassword = asyncHandler(async (req, res) => {
-    const { newPassword, currentPassword } = req.body;
-    const data = authService.updatePassword(req.user.id, { newPassword, currentPassword });
-
-    successResponse(res, data, "Berhasil update password");
-});
-
 const forgotPassword = asyncHandler(async (req, res) => {
-    await authService.forgotPassword()
-    successResponse(res, null, "Link reset berhasil dikirim")
-})
+    await authService.forgotPassword();
+    successResponse(res, null, "Link reset berhasil dikirim");
+});
 
 const logout = asyncHandler(async (req, res) => {
     successResponse(res, null, "Logout berhasil");

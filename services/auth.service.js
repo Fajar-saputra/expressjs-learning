@@ -55,18 +55,16 @@ const resetPassword = async (token, newPassword) => {
 
 const updatePassword = async (userId, { newPassword, currentPassword }) => {
     const user = await userRepository.findByIdWithPassword(userId);
-    // cek user ada atau tidak
+    // Cek user ada atau tidak
     if (!user) throw new appError("User tidak ditemukan", 404);
 
-    // cek apakah password cocok
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) throw new appError("Password salah", 400);
 
-    // hash password baru
-    const hashpassword = await bcrypt.hash(newPassword, 10);
+    // Hash password baru
+    const hashPassword = await bcrypt.hash(newPassword, 10);
 
-    // simpan db
-    await userRepository.updatePassword(userId, hashpasswords);
+    await userRepository.updatePassword(userId, hashPassword);
 
     return null;
 };

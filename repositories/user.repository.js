@@ -16,12 +16,12 @@ const findAll = async () => {
 };
 
 const findByResetToken = async (token) => {
-    const [rows] = await db.execute("SELECT password FROM users WHERE reset_password_token  =?", [token]);
+    const [rows] = await db.execute("SELECT password FROM users WHERE reset_password_token  = ?", [token]);
     return rows[0];
 };
 
 const findByIdWithPassword = async (userId) => {
-    const [rows] = await db.execute("SELECT password FROM users WHERE id =?", [userId]);
+    const [rows] = await db.execute("SELECT password FROM users WHERE id = ?", [userId]);
     return rows[0];
 };
 
@@ -30,12 +30,12 @@ const resetPassword = async (userId, password) => {
 };
 
 const updatePassword = async (userId, password) => {
-    await db.execute('UPDATE users SET password = ? WHERE id = ?', [password, userId])
-}
+    await db.execute("UPDATE users SET password = ? WHERE id = ?", [password, userId]);
+};
 
 const saveResetToken = async (id, token, expire) => {
-    await db.execute('UPDATE users SET reset_password_token = ?, reset_password_expire = ? WHERE id',[token, expire, id])
-}
+    await db.execute("UPDATE users SET reset_password_token = ?, reset_password_expire = ? WHERE id", [token, expire, id]);
+};
 
 const create = async ({ username, email, password, role }) => {
     const [result] = await db.execute("INSERT INTO users (username, email, password, role) VALUES (?,?,?, ?)", [username, email, password, role]);
@@ -57,4 +57,4 @@ const destroy = async (userId) => {
     return;
 };
 
-module.exports = { findAll, findById, findByEmail, findByResetToken, findByIdWithPassword, resetPassword, updatePassword, saveResetToken,create, update, destroy };
+module.exports = { findAll, findById, findByEmail, findByResetToken, findByIdWithPassword, resetPassword, updatePassword, saveResetToken, create, update, destroy };
