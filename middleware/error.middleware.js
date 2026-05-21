@@ -3,6 +3,8 @@ const errorHandler = (err, req, res, next) => {
     let statusCode = err.statusCode || 500;
     let message = err.message || "Internal Server Error";
 
+    console.error(err.errors);
+
     // 2. Handling error spesifik dari library JWT
     if (err.name === "JsonWebTokenError") {
         statusCode = 401;
@@ -18,10 +20,12 @@ const errorHandler = (err, req, res, next) => {
 
     // 4. Kirim response ke client
     res.status(statusCode).json({
-        status: "error",
+        status: err.status || "error",
         message,
         // Tampilkan stack trace hanya jika bukan di environment production
-        ...(process.env.NODE_ENV !== "production" && { stack: err.stack })
+        ...(process.env.NODE_ENV !== "production" && {
+            stack: err.stack?.split("\n").map(e => e.trim())
+        })
     });
 };
 
