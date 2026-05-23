@@ -1,7 +1,17 @@
 const { appError } = require("../utils/appError");
 const userRepository = require("../repositories/user.repository");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
+
+const mailTransporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
+});
 
 const register = async ({ username, email, role, password }) => {
     const user = await userRepository.findByEmail(email);
@@ -23,7 +33,17 @@ const login = async ({ email, password }) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new appError("Password salah", 401);
 
-    const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1hr" });
+    const token = jwt.sign(
+        {
+            id: user.id,
+            username: user.username,
+            role: user.role,
+        },
+        process.env.JWT_SECRET,
+        {
+            expiresIn: "1hr",
+        },
+    );
     return {
         token,
         user: {
@@ -32,25 +52,6 @@ const login = async ({ email, password }) => {
             email: user.email,
         },
     };
-};
-
-const resetPassword = async (token, newPassword) => {
-    const user = await userRepository.findByResetToken(token);
-    // cek user ada atau tidak
-    if (!user) throw new appError("Token tidak valid", 400);
-
-    // cek expire
-    const now = Date.now();
-
-    if (user.reset_password_expire < now) throw new Error("Token sudah expire", 400);
-
-    // hash password baru
-    const hashpassword = await bcrypt.hash(newPassword, 10);
-
-    // kirim data ke repo
-    await userRepository.resetPassword(user.id, hashpassword);
-
-    return null;
 };
 
 const updatePassword = async (userId, { newPassword, currentPassword }) => {
@@ -71,21 +72,50 @@ const updatePassword = async (userId, { newPassword, currentPassword }) => {
 
 const forgotPassword = async (email) => {
     const user = await userRepository.findByEmail(email);
-    // cek user ada atau tidak
-    if (!user) throw new appError("User tidak ditemuka", 404);
+    if (!user) {
+        throw new appError("User tidak ditemukan", 404);
+    }
 
-    // generate token random
-    const resetToken = crypto.randomByte(32).toString("hex");
-    // expire
-    const expire = new Date(Date.now + 15 * 60 * 3600);
+    // Generate token
+    const resetToken = await crypto.randomBytes(32).toString('hex');
 
-    // simpan di db
+    // Expire 15 menit
+    const expire = new Date(Date.now() + 15 * 60 * 1000);
+
+    // Simpan token ke database
     await userRepository.saveResetToken(user.id, resetToken, expire);
 
-    // link reset
-    const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
+    // Buat link reset
+    const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:3000'}/reset-password/${resetToken}`;
 
-    return null;
+    await mailTransporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: user.email,
+        subject: "Reset Password",
+        html: `
+            <p>Halo ${user.username || ""},</p>
+            <p>Klik link berikut untuk reset password Anda:</p>
+            <p><a href="${resetUrl}">${resetUrl}</a></p>
+            <p>Link ini berlaku selama 15 menit.</p>
+        `,
+    });
+
+    return resetToken;
+};
+
+const resetPassword = async (token, newPassword) => {
+    const user = await userRepository.findByResetToken(token);
+
+    if (!user) {
+        throw new appError("Token tidak valid", 400);
+    }
+    if (user.reset_password_expire.getTime() < Date.now()) {
+        throw new appError("Token sudah kadaluarsa", 400);
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await userRepository.resetPassword(user.id, hashedPassword);
 };
 
 module.exports = { login, register, resetPassword, updatePassword, forgotPassword };

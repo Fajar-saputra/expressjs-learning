@@ -1,4 +1,5 @@
 const authService = require("../services/auth.service");
+const { appError } = require("../utils/appError");
 const { asyncHandler } = require("../utils/asyncHandler");
 const { successResponse } = require("../utils/successResponse");
 
@@ -9,7 +10,7 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const registerUser = asyncHandler(async (req, res) => {
-    const { email, username, password, role } = req.body;
+    const { email, username, password, role } = req.body;   
     const user = await authService.register({ email, username, password, role });
     successResponse(res, user, "Berhasil register", 201);
 });
@@ -20,21 +21,27 @@ const updatePassword = asyncHandler(async (req, res) => {
     successResponse(res, data, "Berhasil update password");
 });
 
-const resetPassoword = asyncHandler(async (req, res) => {
-    const { token } = req.params;
+const forgotPassword = asyncHandler(async (req, res) => {
+    const { email } = req.body;
 
-    await authService.resetPassword(token, req.body.password);
+    if (!email) throw new appError("Email harus diisi", 400);
 
-    successResponse(res, null, "Password berhasil direset");
+    await authService.forgotPassword(email);
+    successResponse(res, null, "Link reset password telah dikirim ke email Anda");
 });
 
-const forgotPassword = asyncHandler(async (req, res) => {
-    await authService.forgotPassword();
-    successResponse(res, null, "Link reset berhasil dikirim");
+const resetPassword = asyncHandler(async (req, res) => {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    if (!password) throw new appError("Password baru harus diisi", 400);
+    await authService.resetPassword(token, password);
+
+    successResponse(res, null, "Password berhasil direset");
 });
 
 const logout = asyncHandler(async (req, res) => {
     successResponse(res, null, "Logout berhasil");
 });
 
-module.exports = { loginUser, registerUser, resetPassoword, logout, updatePassword };
+module.exports = { loginUser, registerUser, resetPassword, logout, updatePassword, forgotPassword };

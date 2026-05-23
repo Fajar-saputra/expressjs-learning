@@ -16,7 +16,12 @@ const findAll = async () => {
 };
 
 const findByResetToken = async (token) => {
-    const [rows] = await db.execute("SELECT password FROM users WHERE reset_password_token  = ?", [token]);
+    const [rows] = await db.execute(
+        `SELECT id, reset_password_expire 
+             FROM users 
+             WHERE reset_password_token = ?`,
+        [token],
+    );
     return rows[0];
 };
 
@@ -25,16 +30,29 @@ const findByIdWithPassword = async (userId) => {
     return rows[0];
 };
 
-const resetPassword = async (userId, password) => {
-    const [rows] = await db.execute("UPDATE users SET password = ?,  reset_password_token = NULL, reset_password_expire = NULL WHERE id = ?", [userId]);
-};
-
 const updatePassword = async (userId, password) => {
     await db.execute("UPDATE users SET password = ? WHERE id = ?", [password, userId]);
 };
 
-const saveResetToken = async (id, token, expire) => {
-    await db.execute("UPDATE users SET reset_password_token = ?, reset_password_expire = ? WHERE id", [token, expire, id]);
+const resetPassword = async (userId, hashedPassword) => {
+    await db.execute(
+        `UPDATE users 
+             SET password = ?, 
+                 reset_password_token = NULL, 
+                 reset_password_expire = NULL 
+             WHERE id = ?`,
+        [hashedPassword, userId],
+    );
+};
+
+const saveResetToken = async (userId, resetToken, expireTime) => {
+    await db.execute(
+        `UPDATE users 
+             SET reset_password_token = ?, 
+                 reset_password_expire = ? 
+             WHERE id = ?`,
+        [resetToken, expireTime, userId],
+    );
 };
 
 const create = async ({ username, email, password, role }) => {
