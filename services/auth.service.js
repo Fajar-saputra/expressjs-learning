@@ -23,15 +23,46 @@ const login = async ({ email, password }) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new appError("Password salah", 401);
 
-    const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1hr" });
+    // access token
+    const accessToken = jwt.sign(
+        {
+            id: user.id,
+            role: user.role,
+        },
+        process.env.JWT_SECRET,
+        {
+            expiresIn: "1h",
+        },
+    );
+
+    // refresh token
+    const refreshToken = jwt.sign(
+        {
+            id: user.id,
+            role: user.role,
+        },
+        process.env.JWT_REFRESH_SECRET,
+        {
+            expiresIn: "1d",
+        },
+    );
+
+    // simpan refresh token ke db
+    await userRepository.saveRefreshToken(user.id, refreshToken);
+
     return {
-        token,
         user: {
             id: user.id,
             username: user.username,
             email: user.email,
         },
+        accessToken,
+        refreshToken,
     };
 };
 
-module.exports = { login, register };
+const logout = async (userId) => {
+    return userRepository.removeRefreshToken(userId);
+};
+
+module.exports = { login, register, logout };

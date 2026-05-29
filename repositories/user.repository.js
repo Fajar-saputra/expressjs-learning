@@ -27,12 +27,19 @@ const update = async (userId, { username, email, password }) => {
         password,
         userId,
     ]);
-    return;
+    return result;
 };
 
 const destroy = async (userId) => {
-    const [rows] = await db.execute("DELETE * FROM users WHERE id = ?", [userId]);
-    return;
+    return db.execute("DELETE * FROM users WHERE id = ?", [userId]);
 };
 
-module.exports = { findAll, findById, findByEmail, create, update, destroy };
+const saveRefreshToken = async (userId, refreshToken) => {
+    await db.execute("UPDATE users SET refresh_token = ? WHERE id = ?", [refreshToken, userId]);
+};
+
+const removeRefreshToken = async (userId) => {
+    await db.execute("UPDATE users SET refresh_token = NULL WHERE id = ?", [userId]);
+};
+
+module.exports = { findAll, findById, findByEmail, create, update, destroy, saveRefreshToken, removeRefreshToken };
