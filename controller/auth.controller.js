@@ -40,7 +40,13 @@ const resetPassword = asyncHandler(async (req, res) => {
     successResponse(res, null, "Password berhasil direset");
 });
 
+const refreshAccessToken = asyncHandler(async (req, res) => {
+    const data = await authService.refreshAccessToken(req.body.refreshToken)
+    successResponse(res, data, "Access token baru")
+})
+
 const logout = asyncHandler(async (req, res) => {
+    await authService.logout(req.user.id)
     successResponse(res, null, "Logout berhasil");
 });
 

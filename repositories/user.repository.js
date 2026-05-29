@@ -55,6 +55,15 @@ const saveResetToken = async (userId, resetToken, expireTime) => {
     );
 };
 
+const saveRefreshToken = async (userId, refreshToken) => {
+    await db.execute('UPDATE users SET refresh_token = ? WHERE id = ?', [refreshToken, userId])
+}
+
+const removeRefreshToken = async (userId) => {
+    await db.execute('UPDATE users SET refresh_token = NULL WHERE id = ?', [userId])
+    return null;
+}
+
 const create = async ({ username, email, password, role }) => {
     const [result] = await db.execute("INSERT INTO users (username, email, password, role) VALUES (?,?,?, ?)", [username, email, password, role]);
     return result;
@@ -75,4 +84,4 @@ const destroy = async (userId) => {
     return;
 };
 
-module.exports = { findAll, findById, findByEmail, findByResetToken, findByIdWithPassword, resetPassword, updatePassword, saveResetToken, create, update, destroy };
+module.exports = { findAll, findById, findByEmail, findByResetToken, findByIdWithPassword, resetPassword, updatePassword, saveResetToken, create, update, destroy, removeRefreshToken };

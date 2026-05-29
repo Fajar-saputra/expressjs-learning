@@ -27,16 +27,17 @@ const register = async ({ username, email, role, password }) => {
 };
 
 const login = async ({ email, password }) => {
+    // temukan user
     const user = await userRepository.findByEmail(email);
+    // cek apakah user ada
     if (!user) throw new appError("User belum register!", 404);
-
+    // cek apakah password yang kirim benar
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new appError("Password salah", 401);
-
-    const token = jwt.sign(
+    // access token
+    const accessToken = jwt.sign(
         {
             id: user.id,
-            username: user.username,
             role: user.role,
         },
         process.env.JWT_SECRET,
@@ -44,8 +45,22 @@ const login = async ({ email, password }) => {
             expiresIn: "1hr",
         },
     );
+    // refresh token
+    const refreshToken = jwt.sign(
+        {
+            id: user.id,
+        },
+        process.env.JWT_REFRESH_SECRET,
+        {
+            expiresIn: "1d",
+        },
+    );
+    // simapn refresh token
+    await userRepository.saveRefreshToken(user.id, refreshToken);
+
     return {
-        token,
+        accessToken,
+        refreshToken,
         user: {
             id: user.id,
             username: user.username,
@@ -77,7 +92,7 @@ const forgotPassword = async (email) => {
     }
 
     // Generate token
-    const resetToken = await crypto.randomBytes(32).toString('hex');
+    const resetToken = await crypto.randomBytes(32).toString("hex");
 
     // Expire 15 menit
     const expire = new Date(Date.now() + 15 * 60 * 1000);
@@ -86,7 +101,7 @@ const forgotPassword = async (email) => {
     await userRepository.saveResetToken(user.id, resetToken, expire);
 
     // Buat link reset
-    const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:3000'}/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.CLIENT_URL || "http://localhost:3000"}/reset-password/${resetToken}`;
 
     await mailTransporter.sendMail({
         from: process.env.EMAIL_USER,
@@ -118,4 +133,35 @@ const resetPassword = async (token, newPassword) => {
     await userRepository.resetPassword(user.id, hashedPassword);
 };
 
-module.exports = { login, register, resetPassword, updatePassword, forgotPassword };
+const refreshToken = async (refreshToken) => {
+    // cek refresh token
+    if (!refreshToken) {
+        throw new appError("Refresh token wajib ada", 401);
+    }
+    // verify token
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    const user = await userRepository.findById(decoded.id);
+    // cek
+    if (user.refresh_token !== refreshToken) throw new appError("Token tidak valid", 401);
+    // access token baru
+    const newAccessToken = jwt.sign(
+        {
+            id: user.id,
+            role: user.role,
+        },
+        process.env.JWT_SECRET,
+        {
+            expiresIn: "15m",
+        },
+    );
+
+    return {
+        accessToken: newAccessToken,
+    };
+};
+
+const logout = async (userId) => {
+    return userRepository.removeRefreshToken(userId)
+}
+
+module.exports = { login, logout,register, resetPassword, updatePassword, forgotPassword, refreshToken };

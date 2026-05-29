@@ -11,5 +11,9 @@ router.get("/logout", logout);
 router.post("/update-password",protect, updatePassword);
 router.post("/reset-password/:token", resetPassword);
 router.post("/forgot-password", forgotPassword);
+router.post(
+    "/refresh-token",
+    refreshAccessToken
+);
 
 module.exports = router;
