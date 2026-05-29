@@ -26,9 +26,14 @@ const productById = asyncHandler(async (req, res) => {
     const product = await productService.getById(req.params.productId);
     successResponse(res, product, `Berhasil user ID ${product.id}`);
 });
+
 const productAll = asyncHandler(async (req, res) => {
     const product = await productService.getByAll();
     successResponse(res, product, `Berhasil ambil semua user`);
 });
 
-module.exports = { createProduct, productById, productAll };
+const deleteProduct = asyncHandler(async (req, res) => {
+    const product = await productService.deleteProduct(req.params.productId)
+})
+
+module.exports = { createProduct, productById, productAll, deleteProduct };
