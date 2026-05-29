@@ -32,8 +32,27 @@ const productAll = asyncHandler(async (req, res) => {
     successResponse(res, product, `Berhasil ambil semua user`);
 });
 
-const deleteProduct = asyncHandler(async (req, res) => {
-    const product = await productService.deleteProduct(req.params.productId)
-})
+const updateProduct = asyncHandler(async (req, res) => {
+    const { id } = req.params.productId;
+    const { name, category, description, price } = req.body;
 
-module.exports = { createProduct, productById, productAll, deleteProduct };
+    let imagePath;
+
+    req.file ? (imagePath = `/uploads/${req.file.filename}`) : (imagePath = null);
+
+    const data = await productService.updateProduct(id, {
+        name,
+        category,
+        description,
+        price,
+        image: imagePath,
+    });
+
+    successResponse(res, data, "Product berhasil diupdate");
+});
+
+const deleteProduct = asyncHandler(async (req, res) => {
+    const product = await productService.deleteProduct(req.params.productId);
+});
+
+module.exports = { createProduct, productById, productAll, deleteProduct, updateProduct };
