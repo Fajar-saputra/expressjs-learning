@@ -26,9 +26,9 @@ const productById = asyncHandler(async (req, res) => {
     const product = await productService.getById(req.params.productId);
     successResponse(res, product, `Berhasil user ID ${product.id}`);
 });
-const prodcutAll = asyncHandler(async (req, res) => {
+const productAll = asyncHandler(async (req, res) => {
     const product = await productService.getByAll();
     successResponse(res, product, `Berhasil ambil semua user`);
 });
 
-module.exports = { createProduct, productById, prodcutAll };
+module.exports = { createProduct, productById, productAll };
