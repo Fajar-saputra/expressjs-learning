@@ -19,4 +19,10 @@ const logoutUser = asyncHandler(async (req, res) => {
     successResponse(res, "Berhasil logout");
 });
 
-module.exports = { loginUser, registerUser, logoutUser };
+const updatePassword = asyncHandler(async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+    await authService.changePassword(req.user.id, currentPassword, newPassword);
+    successResponse(res, "Password berhasil diubah");
+});
+
+module.exports = { loginUser, registerUser, logoutUser, updatePassword };

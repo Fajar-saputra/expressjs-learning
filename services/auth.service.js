@@ -65,4 +65,24 @@ const logout = async (userId) => {
     return userRepository.removeRefreshToken(userId);
 };
 
-module.exports = { login, register, logout };
+const changePassword = async (userId, currentPassword, newPassword) => {
+    const user = await userRepository.findByIdWithPassword(userId);
+    // cek user ada atau tidak
+    if (!user) throw new appError("User tidak ada", 404);
+
+    // verify password
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) throw new appError("Password lama salah", 400);
+
+    // password lama tidak boleh sama
+    if (currentPassword === newPassword) throw new appError("Password lama tidak boleh sama dengan password baru", 400);
+
+    // hash new password
+    const hashNewPassword = await bcrypt.hash(newPassword, 10);
+
+    await userRepository.updatePassword(user.id, hashNewPassword);
+
+    return null;
+};
+
+module.exports = { login, register, logout, changePassword };
