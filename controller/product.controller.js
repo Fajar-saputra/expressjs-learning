@@ -31,4 +31,30 @@ const prodcutAll = asyncHandler(async (req, res) => {
     successResponse(res, product, `Berhasil ambil semua user`);
 });
 
-module.exports = { createProduct, productById, prodcutAll };
+const updateProduct = asyncHandler(async (req, res) => {
+    // ambil data dari req body
+    const { name, category, description, price } = req.body;
+    const { productId } = req.params;
+
+    // cek gambar ada atau tidak
+    let imagePath;
+    if (req.file) imagePath = `/uploads/${req.file.filename}`;
+
+    // kirim data product
+    const product = await productService.updateProduct(productId, {
+        name,
+        category,
+        description,
+        price,
+        image: imagePath,
+    });
+
+    successResponse(res, prodcut, "Berhasil update data product");
+});
+
+const deleteProduct = asyncHandler(async (req, res) => {
+    const user = await productService.deleteProduct(req.params.productId);
+    successResponse(res, user, `Berhasil delete product ID ${req.params.productId}`);
+});
+
+module.exports = { createProduct, productById, prodcutAll, deleteProduct, updateProduct };

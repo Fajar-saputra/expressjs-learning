@@ -21,15 +21,20 @@ const create = async ({ name, category, description, price, image }) => {
 
 const update = async (productId, { name, category, description, price, image }) => {
     const [result] = await db.execute(
-        "UPDATE  products SET name = COALESCE(?, name), category = COALESCE(?, category), description = COALESCE(?, description), price = COALESCE(?, price), image = COALESCE(?, image) WHERE id = ?",
-        [name || null, category || null, description || null, price || null, image || null, productId],
+        `UPDATE  products SET 
+        name = COALESCE(?, name),
+        category = COALESCE(?, category),
+        description = COALESCE(?, description),
+        price = COALESCE(?, price),
+        image = COALESCE(?, image)
+        WHERE id = ?`,
+        [name ?? null, category ?? null, description ?? null, price ?? null, image ?? null, productId],
     );
-    return;
+    return result;
 };
 
 const destroy = async (productId) => {
-    const [rows] = await db.execute("DELETE * FROM users WHERE id = ?", [productId]);
-    return;
+    return await db.execute("DELETE * FROM users WHERE id = ?", [productId]);
 };
 
-module.exports = { findAll, findById, findByName,create, update, destroy };
+module.exports = { findAll, findById, findByName, create, update, destroy };

@@ -10,6 +10,9 @@ const storage = multer.diskStorage({
         const ext = path.extname(file.originalname);
         const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
         cb(null, uniqueName);
+
+        // const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+        // cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
     },
 });
 
@@ -29,4 +32,4 @@ const limits = {
 
 const upload = multer({ storage, fileFilter, limits });
 
-module.exports = {upload}
+module.exports = { upload };
