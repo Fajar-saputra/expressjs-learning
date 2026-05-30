@@ -10,7 +10,7 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const registerUser = asyncHandler(async (req, res) => {
-    const { email, username, password, role } = req.body;   
+    const { email, username, password, role } = req.body;
     const user = await authService.register({ email, username, password, role });
     successResponse(res, user, "Berhasil register", 201);
 });
@@ -41,13 +41,13 @@ const resetPassword = asyncHandler(async (req, res) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
-    const data = await authService.refreshAccessToken(req.body.refreshToken)
-    successResponse(res, data, "Access token baru")
-})
+    const data = await authService.refreshToken(req.body.refreshToken);
+    successResponse(res, data, "Access token baru");
+});
 
 const logout = asyncHandler(async (req, res) => {
-    await authService.logout(req.user.id)
+    await authService.logout(req.user.id);
     successResponse(res, null, "Logout berhasil");
 });
 
-module.exports = { loginUser, registerUser, resetPassword, logout, updatePassword, forgotPassword };
+module.exports = { loginUser, registerUser, resetPassword, logout, updatePassword, forgotPassword, refreshAccessToken };
