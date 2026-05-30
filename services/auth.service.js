@@ -85,4 +85,56 @@ const changePassword = async (userId, currentPassword, newPassword) => {
     return null;
 };
 
-module.exports = { login, register, logout, changePassword };
+const forgotPassword = async (email) => {
+    // cek email
+    if (!email) throw new appError("Email wajib diisi", 400);
+    const user = await userRepository.findByEmail(email);
+    // cek user
+    if (!user) throw new appError("User tidak ditemukan!", 404);
+
+    // generate token
+    const resetToken = await crypto.randomByte(32).toString("hex");
+
+    // expire time
+    const expireTime = new Date(Date.now() * 15 * 60 * 1000);
+
+    // simpan ke db
+    await saveResetToken(user.id, resetToken, expireTime);
+
+    // link reset
+    const linkUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+
+    await mailTransporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: process.env.EMAIL_USER, // ganti dengan user.email
+        subject: "Reset Password User",
+        html: `
+        <p>Halo ${user.username || ""},</p>
+            <p>Klik link berikut untuk reset password Anda:</p>
+            <p><a href="${resetUrl}">${resetUrl}</a></p>
+            <p>Link ini berlaku selama 15 menit.</p>
+
+        `,
+    });
+
+    return { resetToken };
+};
+
+const resetPassword = async (resetToken, newPassword) => {
+    // cek token
+    if (!resetToken) throw new appError("Token wajib diisi", 400);
+    const user = await userRepository.findByResetToken(resetToken);
+    // cek user
+    if (!user) throw new appError(`Token tidak valid`, 400);
+
+    // cek apakah token tidak kadaluwarsa
+    if (user.reset_password_experi < Date.now()) throw new appError("Token telah kadaluwarsa", 400);
+
+    // hash new password
+    const hashNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // simpah password baru dan reset token serta expire
+    await userRepository.resetPassword(user.id, hashNewPassword);
+};
+
+module.exports = { login, register, logout, changePassword, forgotPassword, resetPassword };

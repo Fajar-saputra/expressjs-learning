@@ -25,4 +25,15 @@ const updatePassword = asyncHandler(async (req, res) => {
     successResponse(res, "Password berhasil diubah");
 });
 
-module.exports = { loginUser, registerUser, logoutUser, updatePassword };
+const forgotPassowrd = asyncHandler(async (req, res) => {
+    await authService.forgotPassword(req.body.email);
+    successResponse(res, "Link reset telah dikirim");
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+    await authService.resetPassword(currentPassword, newPassword);
+    successResponse(res, "Password berhasil direset");
+});
+
+module.exports = { loginUser, registerUser, logoutUser, updatePassword, forgotPassowrd, resetPassword };

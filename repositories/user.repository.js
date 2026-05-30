@@ -51,4 +51,51 @@ const removeRefreshToken = async (userId) => {
     await db.execute("UPDATE users SET refresh_token = NULL WHERE id = ?", [userId]);
 };
 
-module.exports = { findAll, findById, findByEmail, findByIdWithPassword, create, update, destroy,updatePassword, saveRefreshToken, removeRefreshToken };
+const saveResetToken = async (userId, resetToken, expireTime) => {
+    await db.execute(
+        `UPDATE users SET 
+        reset_password_token = ?,
+        reset_password_expire = ?
+        WHERE id = ?`,
+        [resetToken, expireTime, userId],
+    );
+};
+
+const findByResetToken = async (resetToken) => {
+    const [result] = await db.execute(
+        `
+        SELECT reset_password_expire FROM users
+        WHERE reset_password_token = ?`,
+        [resetToken],
+    );
+
+    return result[0] || null;
+};
+
+const resetPassword = async (userId, newPassword) => {
+    await db.execute(
+        `
+        UPDATE users
+        SET password = ?,
+        reset_password_token = NULL,
+        reset_password_exprire = NULL
+        WHERE id = ?`,
+        [newPassword, userId],
+    );
+};
+
+module.exports = {
+    findAll,
+    findById,
+    findByEmail,
+    findByIdWithPassword,
+    create,
+    update,
+    destroy,
+    updatePassword,
+    saveRefreshToken,
+    removeRefreshToken,
+    saveResetToken,
+    findByResetToken,
+    resetPassword,
+};
