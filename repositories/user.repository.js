@@ -20,9 +20,33 @@ const findByIdWithPassword = async (userId) => {
     return rows[0] || null;
 };
 
-const create = async ({ username, email, password, role }) => {
-    const [result] = await db.execute("INSERT INTO users (username, email, password, role) VALUES (?,?,?, ?)", [username, email, password, role]);
-    return result;
+const findByVerificationToken = async (token) => {
+    const [rows] = await db.execute("SELECT verification_expire FROM users WHERE  verification_token = ?", [token]);
+    return rows[0] || null;
+};
+
+const veriryUser = async (userId) => {
+    await db.execute(
+        `
+        UPDATE users
+        SET
+        is_verified = true,
+        verification_expire = NULL,
+        verification_token = NULL
+        WHERE id = ?`,
+        userId,
+    );
+};
+
+const create = async ({ username, email, role = "user", password, verificationToken, verificationExpire }) => {
+    const [result] = await db.execute(
+        `
+        INSERT INTO
+        users (username, email, password, role, verificationToken,verificationExpire )
+        VALUES (?,?,?, ?)`,
+        [username, email, password, role, verificationToken, verificationExpire],
+    );
+    return { id: result.insertId, username: username, email: email };
 };
 
 const update = async (userId, { username, email, password }) => {
@@ -36,7 +60,7 @@ const update = async (userId, { username, email, password }) => {
 };
 
 const destroy = async (userId) => {
-    return db.execute("DELETE * FROM users WHERE id = ?", [userId]);
+    return db.execute("DELETE FROM users WHERE id = ?", [userId]);
 };
 
 const updatePassword = async (userId, hashNewPassword) => {
@@ -89,6 +113,7 @@ module.exports = {
     findById,
     findByEmail,
     findByIdWithPassword,
+    findByVerificationToken,
     create,
     update,
     destroy,

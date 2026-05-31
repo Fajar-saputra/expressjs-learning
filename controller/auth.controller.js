@@ -14,6 +14,12 @@ const registerUser = asyncHandler(async (req, res) => {
     successResponse(res, user, "Berhasil register", 201);
 });
 
+const verifyEmail = asyncHandler(async (req, res) => {
+    const { token } = req.params;
+    await authService.verifyEmail(token);
+    successResponse(res, "Email berhasil diverifikasi");
+});
+
 const logoutUser = asyncHandler(async (req, res) => {
     await authService.logout(req.user.id);
     successResponse(res, "Berhasil logout");

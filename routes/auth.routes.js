@@ -9,5 +9,6 @@ router.post("/logout", protect, logoutUser);
 router.post("/update-password", protect, updatePassword);
 router.post("/forgot-password", forgotPassowrd);
 router.post("/reset-password/:token", resetPassword);
+router.post("/verify-email/:token", verifyEmail)
 
 module.exports = router;

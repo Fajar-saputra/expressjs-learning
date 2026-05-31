@@ -5,7 +5,7 @@ const findById = async (productId) => {
     return rows[0] || null;
 };
 const findByName = async (name) => {
-    const [rows] = await db.execute("SELECT * FROM products WHERE id =?", [name]);
+    const [rows] = await db.execute("SELECT * FROM products WHERE name =?", [name]);
     return rows[0] || null;
 };
 
@@ -36,7 +36,7 @@ const update = async (productId, { name, category, description, price, image }) 
 };
 
 const destroy = async (productId) => {
-    const [rows] = await db.execute("DELETE * FROM users WHERE id = ?", [productId]);
+    const [rows] = await db.execute("DELETE FROM products WHERE id = ?", [productId]);
     return rows[0] || null;
 };
 

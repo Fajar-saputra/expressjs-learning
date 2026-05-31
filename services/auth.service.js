@@ -2,23 +2,80 @@ const { appError } = require("../utils/appError");
 const userRepository = require("../repositories/user.repository");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const { sendEmail } = require("../utils/sendEmail");
 
-const register = async ({ username, email, role, password }) => {
+const register = async ({ username, email, role = NULL, password }) => {
     const user = await userRepository.findByEmail(email);
     if (user) {
         throw new appError("User sudah register!", 400);
     }
 
+    // hash password
     const hashpassword = await bcrypt.hash(password, 10);
 
-    await userRepository.create({ username, email, role, password: hashpassword });
+    //  generate verification token
+    const verificationToken = await crypto.ramdomByte(32).toString("hex");
 
-    return { username, email };
+    // expire time
+    const exprireTime = new Date(Date.now + 15 * 60 * 1000);
+
+    // create user
+    const user = await userRepository.create({
+        username,
+        email,
+        role,
+        password: hashpassword,
+        verificationToken,
+        verificationExpire: exprireTime,
+    });
+
+    // verification url
+    const linkUrl = `${process.env.CLIENT_URL}/verification-email/${verificationToken}`;
+
+    // send email
+    await sendEmail({
+        to: email,
+        subject: "Verify Email",
+        html: `
+            <h2>Verifikasi Email</h2>
+
+            <p>Klik link di bawah:</p>
+
+            <a href="${verifyUrl}">
+                Verify Email
+            </a>
+
+            <p>Expired 15 menit.</p>
+        `,
+    });
+
+    return user;
+};
+
+const verifyEmail = async (token) => {
+    // cek token
+    if (!token) throw new appError("Token wajib diisi", 400);
+    // cek di db
+    const user = await userRepository.findByVerificationToken(token);
+    if (!user) throw new appError("Token tidak valid", 400);
+
+    // cek expire
+    if (user.verification_expire < Date.now()) throw new appError("Token sudah expire", 400);
+
+    // verify
+    await userRepository.veriryUser(user.id);
+
+    return null;
 };
 
 const login = async ({ email, password }) => {
+    // cek email
     const user = await userRepository.findByEmail(email);
     if (!user) throw new appError("User belum register!", 404);
+
+    // cek verified email
+    if (!user.is_verified) throw new appError("Silakan verifikasi email dulu", 401);
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new appError("Password salah", 401);
@@ -137,4 +194,12 @@ const resetPassword = async (resetToken, newPassword) => {
     await userRepository.resetPassword(user.id, hashNewPassword);
 };
 
-module.exports = { login, register, logout, changePassword, forgotPassword, resetPassword };
+module.exports = {
+    login,
+    register,
+    logout,
+    changePassword,
+    forgotPassword,
+    resetPassword,
+    verifyEmail,
+};
