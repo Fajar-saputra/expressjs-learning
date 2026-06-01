@@ -15,7 +15,7 @@ const register = async ({ username, email, role = NULL, password }) => {
     const hashpassword = await bcrypt.hash(password, 10);
 
     //  generate verification token
-    const verificationToken = await crypto.ramdomByte(32).toString("hex");
+    const verificationToken = await crypto.randomBytes(32).toString("hex");
 
     // expire time
     const exprireTime = new Date(Date.now + 15 * 60 * 1000);
@@ -150,7 +150,7 @@ const forgotPassword = async (email) => {
     if (!user) throw new appError("User tidak ditemukan!", 404);
 
     // generate token
-    const resetToken = await crypto.randomByte(32).toString("hex");
+    const resetToken = await crypto.randomBytes(32).toString("hex");
 
     // expire time
     const expireTime = new Date(Date.now() * 15 * 60 * 1000);

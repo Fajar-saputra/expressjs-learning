@@ -42,4 +42,12 @@ const resetPassword = asyncHandler(async (req, res) => {
     successResponse(res, "Password berhasil direset");
 });
 
-module.exports = { loginUser, registerUser, logoutUser, updatePassword, forgotPassowrd, resetPassword };
+module.exports = {
+    loginUser,
+    registerUser,
+    logoutUser,
+    updatePassword,
+    forgotPassowrd,
+    resetPassword,
+    verifyEmail
+};
